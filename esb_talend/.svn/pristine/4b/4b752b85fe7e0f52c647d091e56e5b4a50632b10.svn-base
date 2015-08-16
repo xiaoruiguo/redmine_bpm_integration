@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:TalendProperties="http://www.talend.org/properties">
+  <TalendProperties:Property xmi:id="_zfxZcDNHEeWgbO1kWpKBEw" id="_zfwyYDNHEeWgbO1kWpKBEw" label="Aggregate" creationDate="2015-07-26T00:38:39.623-0300" modificationDate="2015-07-26T00:38:39.623-0300" version="0.1" item="_zfxZcjNHEeWgbO1kWpKBEw">
+    <author href="../../../talend.project#_zYJugDNHEeWgbO1kWpKBEw"/>
+  </TalendProperties:Property>
+  <TalendProperties:ItemState xmi:id="_zfxZcTNHEeWgbO1kWpKBEw" path="Generic/system"/>
+  <TalendProperties:SQLPatternItem xmi:id="_zfxZcjNHEeWgbO1kWpKBEw" property="_zfxZcDNHEeWgbO1kWpKBEw" state="_zfxZcTNHEeWgbO1kWpKBEw" system="true" eltName="Generic">
+    <content href="Aggregate_0.1.item#/"/>
+  </TalendProperties:SQLPatternItem>
+</xmi:XMI>

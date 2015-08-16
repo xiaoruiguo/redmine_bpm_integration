@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:TalendProperties="http://www.talend.org/properties">
+  <TalendProperties:Property xmi:id="_zgDtUTNHEeWgbO1kWpKBEw" id="_zgDtUDNHEeWgbO1kWpKBEw" label="DropSourceTable" creationDate="2015-07-26T00:38:39.653-0300" modificationDate="2015-07-26T00:38:39.653-0300" version="0.1" item="_zgDtUzNHEeWgbO1kWpKBEw">
+    <author href="../../../talend.project#_zYJugDNHEeWgbO1kWpKBEw"/>
+  </TalendProperties:Property>
+  <TalendProperties:ItemState xmi:id="_zgDtUjNHEeWgbO1kWpKBEw" path="Generic/system"/>
+  <TalendProperties:SQLPatternItem xmi:id="_zgDtUzNHEeWgbO1kWpKBEw" property="_zgDtUTNHEeWgbO1kWpKBEw" state="_zgDtUjNHEeWgbO1kWpKBEw" system="true" eltName="Generic">
+    <content href="DropSourceTable_0.1.item#/"/>
+  </TalendProperties:SQLPatternItem>
+</xmi:XMI>

@@ -1,0 +1,10 @@
+pt-BR:
+  #Processos
+  bpm_processes: 'Processos'
+  start_process: 'Iniciar'
+  msg_process_started: 'O processo foi iniciado com sucesso!'
+  msg_process_start_error: 'Ocorreu um erro ao tentar iniciar um novo processo.'
+
+  #Tasks
+  bpm_tasks: 'Tarefas BPM'
+  error_bpm_tasks: 'Ocorreu um erro ao tentar recuperar a lista de tarefas.'

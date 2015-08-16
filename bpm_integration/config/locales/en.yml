@@ -1,0 +1,11 @@
+# English strings go here for Rails i18n
+en:
+  #Processes
+  bpm_processes: 'Processes'
+  start_process: 'Start'
+  msg_process_started: 'The process was successfully started!'
+  msg_process_start_error: 'An error ocurred while trying to start a new process.'
+
+  #Tasks
+  bpm_tasks: 'BPM Tasks'
+  error_bpm_tasks: 'An error ocurred while trying to recover the list of tasks.'

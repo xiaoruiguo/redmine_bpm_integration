@@ -1,7 +1,5 @@
-class BpmProcess
-  include ActiveModel::AttributeMethods
-  include HashInitialize
+class BpmProcess < ModelBase
 
-  attr_accessor :id, :name, :version
-  
+  attr_accessor :id, :key, :name, :description, :version
+
 end

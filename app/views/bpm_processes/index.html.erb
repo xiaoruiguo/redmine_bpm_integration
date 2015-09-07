@@ -26,18 +26,18 @@
   <div class="autoscroll">
     <table class="list issues">
       <tr>
-        <th>ID</th>
         <th>Nome</th>
+        <th>Descrição</th>
         <th>Versão</th>
         <th></th>
       </tr>
 
       <% @process_list.each do |process| %>
         <tr>
-          <td><%= process.id %></td>
           <td><%= process.name %></td>
+          <td><%= process.description %></td>
           <td><%= process.version %></td>
-          <td><%= link_to l('start_process'), start_process_path(process.id), method: :post %></td>
+          <td><%= link_to l('start_process'), start_process_path(process.key), method: :post %></td>
         </tr>
       <% end %>
     </table>

@@ -8,7 +8,7 @@ class BpmProcessesController < ApplicationController
   def start
     begin
       response = Httparty.new.start_process(params[:id])
-      if !response.blank? && response.code == 200
+      if !response.blank? && response.code == 201
         redirect_to :back, notice: l('msg_process_started')
       else
         logger.error response.code

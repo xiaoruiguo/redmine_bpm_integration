@@ -1,4 +1,9 @@
 pt-BR:
+
+  bpm_integration:
+    settings:
+      bpms_url: "URL base dos serviços do BPMS"
+
   #Processos
   bpm_processes: 'Processos'
   start_process: 'Iniciar'

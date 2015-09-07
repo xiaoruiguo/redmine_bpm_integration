@@ -8,4 +8,7 @@ Redmine::Plugin.register :bpm_integration do
 
   menu :top_menu  , :bpm_processes, { controller: 'bpm_processes', action: 'index' } , caption: :bpm_processes
   menu :top_menu  , :bpm_tasks, { controller: 'bpm_tasks', action: 'index' } , caption: :bpm_tasks
+
+  settings default: {}, partial: 'settings/bpm_integration'
+
 end

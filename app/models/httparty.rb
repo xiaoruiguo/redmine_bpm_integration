@@ -1,7 +1,8 @@
 class Httparty
   include HTTParty
-  base_uri 'http://localhost:9090'
+
   format :json
+  base_uri Setting.plugin_bpm_integration[:bpms_url]
 
   def process_list
     hash_process_list = self.class.get('/repository/process-definitions')

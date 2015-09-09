@@ -37,7 +37,7 @@
           <td><%= process.name %></td>
           <td><%= process.description %></td>
           <td><%= process.version %></td>
-          <td><%= link_to l('start_process'), start_process_path(process.key), method: :post %></td>
+          <td><%= link_to l('start_process'), new_bpm_process_path(processId: process.id), method: :get %></td>
         </tr>
       <% end %>
     </table>

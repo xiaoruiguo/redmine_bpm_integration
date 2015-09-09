@@ -1,0 +1,12 @@
+<%= form_tag bpm_processes_path, method: :post, class: 'bpm-form' do %>
+  <%= hidden_field_tag(:id, @process.id) %>
+  <% @form_data.each do |f| %>
+    <div>
+      <div>
+        <%= label_tag f['id'], f['name'], class: 'bpm-form-label' %>
+        <%= text_field_tag "form[#{f['id']}]", nil, class: 'bpm-form-field' %>
+      </div>
+    </div>
+  <% end %>
+  <%= submit_tag 'Iniciar' %>
+<% end %>

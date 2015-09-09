@@ -11,12 +11,29 @@ class Httparty
     return processes
   end
 
-  def start_process(process_key)
+  def start_process(process_key, form)
     self.class.post(
       '/runtime/process-instances',
-      body: { processDefinitionKey: process_key }.to_json,
+      body: start_process_request_body(process_key, form),
       headers: { 'Content-Type' => 'application/json' }
     )
+  end
+
+  def getFormData(processId)
+    self.class.get(
+      '/form/form-data',
+      query: { processDefinitionId: processId },
+      headers: { 'Content-Type' => 'application/json' }
+    )
+  end
+
+  def start_process_request_body(process_key, form)
+    variables = []
+    form.each { |k, v| variables << { name: k, value: v } }
+    {
+      processDefinitionId: process_key,
+      variables: variables
+    }.to_json
   end
 
   def bpm_tasks

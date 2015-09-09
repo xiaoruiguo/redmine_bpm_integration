@@ -17,8 +17,8 @@ class ModelBase
 
   def initialize(*h)
     if h.length == 1 && h.first.kind_of?(Hash)
-      hash = h.first.select { |key, value| attributes.map{ |attr| attr.to_s }.include?(key) }
-      hash.each { |k,v| send("#{k}=",v) }
+      hash = h.first.select { |key, value| (attributes + attributes.map{ |attr| attr.to_s }).include?(key) }
+      hash.each { |k,v| send("#{k}=", v) }
     end
   end
 

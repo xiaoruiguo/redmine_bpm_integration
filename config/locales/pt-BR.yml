@@ -2,7 +2,9 @@ pt-BR:
 
   bpm_integration:
     settings:
-      bpms_url: "URL base dos serviços do BPMS"
+      bpms_url: "URL"
+      bpms_user: "Usuário"
+      bpms_pass: "Senha"
 
   #Processos
   bpm_processes: 'Processos'

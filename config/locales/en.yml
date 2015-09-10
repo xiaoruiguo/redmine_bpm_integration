@@ -1,5 +1,11 @@
-# English strings go here for Rails i18n
 en:
+
+  bpm_integration:
+    settings:
+      bpms_url: "URL"
+      bpms_user: "User"
+      bpms_pass: "Password"
+
   #Processes
   bpm_processes: 'Processes'
   start_process: 'Start'

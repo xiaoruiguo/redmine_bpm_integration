@@ -3,7 +3,19 @@
     <tr>
       <th><%= t('bpm_integration.settings.bpms_url') %>:</th>
       <td>
-        <input type="text" value="<%= settings['bpms_url'] %>" name="settings[bpms_url]">
+        <input type="url" value="<%= settings['bpms_url'] %>" name="settings[bpms_url]">
+      </td>
+    </tr>
+    <tr>
+      <th><%= t('bpm_integration.settings.bpms_user') %>:</th>
+      <td>
+        <input type="text" value="<%= settings['bpms_user'] %>" name="settings[bpms_user]">
+      </td>
+    </tr>
+    <tr>
+      <th><%= t('bpm_integration.settings.bpms_pass') %>:</th>
+      <td>
+        <input type="password" value="<%= settings['bpms_pass'] %>" name="settings[bpms_pass]">
       </td>
     </tr>
 </table>

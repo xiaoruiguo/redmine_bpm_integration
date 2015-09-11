@@ -1,5 +1,5 @@
 class Httparty
-  include HTTParty
+  include HTTMultiParty
   format :json
   base_uri Setting.plugin_bpm_integration[:bpms_url]
 
@@ -41,6 +41,16 @@ class Httparty
       processDefinitionId: process_key,
       variables: variables
     }.to_json
+  end
+
+  def deploy_process(processData)
+    self.class.post(
+      '/repository/deployments',
+      basic_auth: @@auth,
+      query: {
+        file: processData
+      }
+    )
   end
 
   def bpm_tasks

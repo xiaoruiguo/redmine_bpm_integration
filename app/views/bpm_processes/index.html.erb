@@ -1,5 +1,3 @@
-<h1>Processos</h1>
-
 <style type="text/css">
   label,  input {
     display: block;
@@ -22,24 +20,40 @@
   }
 </style>
 
-<% unless @process_list.blank? %>
-  <div class="autoscroll">
-    <table class="list issues">
-      <tr>
-        <th>Nome</th>
-        <th>Descrição</th>
-        <th>Versão</th>
-        <th></th>
-      </tr>
+<script type="text/javascript">
+function performClick(node)
+{
+   var evt = document.createEvent("MouseEvents");
+   evt.initEvent("click", true, false);
+   node.dispatchEvent(evt);
+}
+</script>
 
-      <% @process_list.each do |process| %>
-        <tr>
-          <td><%= process.name %></td>
-          <td><%= process.description %></td>
-          <td><%= process.version %></td>
-          <td><%= link_to l('start_process'), new_bpm_process_path(processId: process.id), method: :get %></td>
-        </tr>
-      <% end %>
-    </table>
-  </div>
+<div class="contextual">
+    <a style="visibility: hidden;"><%= file_field_tag 'upload' %></a>
+    <a class="icon icon-add" href="#" onclick="performClick(document.getElementById('upload'));">Novo processo</a>
+</div>
+
+<h2>Processos</h2>
+
+<% unless @process_list.blank? %>
+<div class="autoscroll">
+  <table class="list issues">
+    <tr>
+      <th>Nome</th>
+      <th>Descrição</th>
+      <th>Versão</th>
+      <th></th>
+    </tr>
+
+    <% @process_list.each do |process| %>
+      <tr>
+        <td><%= process.name %></td>
+        <td><%= process.description %></td>
+        <td><%= process.version %></td>
+        <td><%= link_to l('start_process'), new_bpm_process_path(processId: process.id), method: :get %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
 <% end %>

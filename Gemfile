@@ -2,4 +2,4 @@ source 'https://rubygems.org'
 
 gem 'pry', '~> 0.10.1'
 gem 'pry-nav', '~> 0.2.4'
-gem 'httparty', '~> 0.13.5'
+gem 'httmultiparty', '~> 0.3.16'

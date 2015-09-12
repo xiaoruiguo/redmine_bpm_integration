@@ -7,10 +7,16 @@ en:
       bpms_pass: "Password"
 
   #Processes
+  process_name: 'Name'
+  process_description: 'Description'
+  process_version: 'Version'
+  new_process: 'New process'
   bpm_processes: 'Processes'
   start_process: 'Start'
   msg_process_started: 'The process was successfully started!'
   msg_process_start_error: 'An error ocurred while trying to start a new process.'
+  msg_process_uploaded: 'The process definition was successfully uploaded!'
+  msg_process_upload_error: 'An error ocurred while trying to upload a new process definition.'
 
   #Tasks
   bpm_tasks: 'BPM Tasks'

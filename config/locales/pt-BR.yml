@@ -7,10 +7,16 @@ pt-BR:
       bpms_pass: "Senha"
 
   #Processos
+  process_name: 'Nome'
+  process_description: 'Descrição'
+  process_version: 'Versão'
+  new_process: 'Novo processo'
   bpm_processes: 'Processos'
   start_process: 'Iniciar'
   msg_process_started: 'O processo foi iniciado com sucesso!'
   msg_process_start_error: 'Ocorreu um erro ao tentar iniciar um novo processo.'
+  msg_process_uploaded: 'A definição de processo foi carregada com sucesso!'
+  msg_process_upload_error: 'Ocorreu um erro ao carregar a definição de processo.'
 
   #Tasks
   bpm_tasks: 'Tarefas BPM'

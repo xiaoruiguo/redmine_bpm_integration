@@ -21,8 +21,12 @@
 </style>
 
 <script type="text/javascript">
-function performClick(node)
+function performUploadClick(node)
 {
+   document.getElementById('upload').onchange = function() {
+     document.upload_form.submit();
+   };
+
    var evt = document.createEvent("MouseEvents");
    evt.initEvent("click", true, false);
    node.dispatchEvent(evt);
@@ -30,19 +34,22 @@ function performClick(node)
 </script>
 
 <div class="contextual">
-    <a style="visibility: hidden;"><%= file_field_tag 'upload' %></a>
-    <a class="icon icon-add" href="#" onclick="performClick(document.getElementById('upload'));">Novo processo</a>
+    <%= form_tag upload_process_path, name: "upload_form", multipart: true do %>
+      <%= file_field_tag('upload', style: 'display: none;') %>
+      <%= link_to l('new_process'), '#', class:'icon icon-add', onclick: 'performUploadClick(document.getElementById("upload"));' %>
+      <%= submit_tag('', style: 'display: none;')  %>
+    <% end %>
 </div>
 
-<h2>Processos</h2>
+<h2><%=l('bpm_processes')%></h2>
 
 <% unless @process_list.blank? %>
 <div class="autoscroll">
   <table class="list issues">
     <tr>
-      <th>Nome</th>
-      <th>Descrição</th>
-      <th>Versão</th>
+      <th><%=l('process_name')%></th>
+      <th><%=l('process_description')%></th>
+      <th><%=l('process_version')%></th>
       <th></th>
     </tr>
 
@@ -51,7 +58,7 @@ function performClick(node)
         <td><%= process.name %></td>
         <td><%= process.description %></td>
         <td><%= process.version %></td>
-        <td><%= link_to l('start_process'), new_bpm_process_path(processId: process.id), method: :get %></td>
+        <td><%= link_to l('start_process'), new_bpm_process_path(processId: process.id) %></td>
       </tr>
     <% end %>
   </table>

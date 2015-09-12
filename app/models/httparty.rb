@@ -10,7 +10,12 @@ class Httparty
 
   def process_list
     processes = []
-    self.class.get('/repository/process-definitions', basic_auth: @@auth)["data"].each do |p|
+    process_list = self.class.get(
+      '/repository/process-definitions',
+      query: { latest: true },
+      basic_auth: @@auth
+    )["data"]
+    process_list.each do |p|
       processes << BpmProcess.new( p )
     end
     return processes
@@ -43,12 +48,13 @@ class Httparty
     }.to_json
   end
 
-  def deploy_process(processData)
+  def deploy_process(process_data)
     self.class.post(
       '/repository/deployments',
       basic_auth: @@auth,
+      multipart: true,
       query: {
-        file: processData
+        file: process_data
       }
     )
   end

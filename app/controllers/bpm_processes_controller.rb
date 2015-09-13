@@ -6,9 +6,9 @@ class BpmProcessesController < ApplicationController
   end
 
   def new
-    id = params[:processId]
-    @process = BpmProcess.new id: id
-    @form_data = Httparty.new.getFormData(id)['formProperties']
+    process_id = params[:process_id]
+    @process = BpmProcess.new id: process_id
+    @form_data = Httparty.new.getFormData(process_id)['formProperties']
   end
 
   def upload
@@ -46,6 +46,11 @@ class BpmProcessesController < ApplicationController
     logger.error response.code
     logger.error response.body
     redirect_to :back, alert: l(msg_code)
+  end
+
+  def show
+    process_image = Httparty.new.process_image params[:process_id]
+    send_data process_image, :type => 'image/png',:disposition => 'inline'
   end
 
 end

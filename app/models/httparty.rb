@@ -9,6 +9,7 @@ class Httparty
   }
 
   def process_list
+    process_image('solicitacaoDeFerias:1:23')
     processes = []
     process_list = self.class.get(
       '/repository/process-definitions',
@@ -19,6 +20,13 @@ class Httparty
       processes << BpmProcess.new( p )
     end
     return processes
+  end
+
+  def process_image(process_id)
+    self.class.get(
+      '/repository/process-definitions/' + process_id + '/image',
+      basic_auth: @@auth
+    ).body
   end
 
   def start_process(process_key, form)

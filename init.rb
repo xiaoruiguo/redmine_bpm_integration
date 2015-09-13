@@ -5,7 +5,7 @@ Redmine::Plugin.register :bpm_integration do
   version '0.0.1'
   url 'https://github.com/thalestpires/redmine_bpm_integration'
 
-  menu :top_menu  , :bpm_processes, { controller: 'bpm_processes', action: 'index' } , caption: :bpm_processes
+  menu :top_menu  , :bpm_processes, { controller: 'bpm_processes', action: 'index' } , caption: :bpm_processes, :if => Proc.new { User.current.admin? }
 
   settings default: {}, partial: 'settings/bpm_integration'
 

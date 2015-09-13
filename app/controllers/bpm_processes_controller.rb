@@ -1,6 +1,8 @@
 class BpmProcessesController < ApplicationController
   unloadable
 
+  before_filter :authorize_global
+
   def index
     @process_list = Httparty.new.process_list
   end

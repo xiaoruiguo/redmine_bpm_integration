@@ -1,5 +1,9 @@
+<<<<<<< HEAD:app/views/bpm_processes/new.html.erb
 <%= form_tag bpm_processes_path, method: :post, class: 'bpm-form tabular' do %>
   <%= hidden_field_tag(:id, @process.id) %>
+=======
+<%= form_tag bpm_process_definition_bpm_process_instances_path(params[:bpm_process_definition_id]), method: :post, class: 'bpm-form' do %>
+>>>>>>> rename models, transform httparty into a service, refact routes:app/views/bpm_process_instances/new.html.erb
   <% @form_data.each do |f| %>
     <div>
       <p>
@@ -8,5 +12,5 @@
       </p>
     </div>
   <% end %>
-  <%= submit_tag 'Iniciar' %>
+  <%= submit_tag t('start') %>
 <% end %>

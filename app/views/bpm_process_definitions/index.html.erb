@@ -23,7 +23,7 @@
 <script type="text/javascript">
 function performUploadClick(node)
 {
-   document.getElementById('upload').onchange = function() {
+   document.getElementById('bpm_process_definition_upload').onchange = function() {
      document.upload_form.submit();
    };
 
@@ -34,9 +34,9 @@ function performUploadClick(node)
 </script>
 
 <div class="contextual">
-    <%= form_tag upload_process_path, name: "upload_form", multipart: true do %>
-      <%= file_field_tag('upload', style: 'display: none;') %>
-      <%= link_to l('new_process'), '#', class:'icon icon-add', onclick: 'performUploadClick(document.getElementById("upload"));' %>
+    <%= form_tag bpm_process_definitions_path, name: "upload_form", multipart: true do %>
+      <%= file_field_tag('bpm_process_definition[upload]', style: 'display: none;') %>
+      <%= link_to l('new_process'), '#', class:'icon icon-add', onclick: 'performUploadClick(document.getElementById("bpm_process_definition_upload"));' %>
       <%= submit_tag('', style: 'display: none;')  %>
     <% end %>
 </div>
@@ -58,7 +58,11 @@ function performUploadClick(node)
         <td><%= link_to process.name, show_process_path(process_id: process.id) %></td>
         <td><%= process.description %></td>
         <td><%= process.version %></td>
+<<<<<<< HEAD:app/views/bpm_processes/index.html.erb
         <td><%= link_to l('start_process'), new_bpm_process_path(process_id: process.id) %></td>
+=======
+        <td><%= link_to l('start_process'), new_bpm_process_definition_bpm_process_instance_path(process) %></td>
+>>>>>>> rename models, transform httparty into a service, refact routes:app/views/bpm_process_definitions/index.html.erb
       </tr>
     <% end %>
   </table>

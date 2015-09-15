@@ -22,4 +22,8 @@ class ModelBase
     end
   end
 
+  # Called when pass to URL Helper
+  def to_param
+    id
+  end
 end

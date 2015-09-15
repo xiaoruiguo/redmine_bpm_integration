@@ -1,6 +1,7 @@
-class Httparty
+class ActivitiBpmService
   include HTTMultiParty
   format :json
+
   base_uri Setting.plugin_bpm_integration[:bpms_url]
 
   @@auth = {
@@ -8,29 +9,30 @@ class Httparty
     password: Setting.plugin_bpm_integration[:bpms_pass]
   }
 
-  def process_list
-    process_image('solicitacaoDeFerias:1:23')
+  def self.process_list
     processes = []
-    process_list = self.class.get(
+    process_list = get(
       '/repository/process-definitions',
       query: { latest: true },
       basic_auth: @@auth
     )["data"]
+
     process_list.each do |p|
-      processes << BpmProcess.new( p )
+      processes << BpmProcessDefinition.new(p)
     end
+
     return processes
   end
 
-  def process_image(process_id)
-    self.class.get(
+  def self.process_image(process_id)
+    get(
       '/repository/process-definitions/' + process_id + '/image',
       basic_auth: @@auth
     ).body
   end
 
-  def start_process(process_key, form)
-    self.class.post(
+  def self.start_process(process_key, form)
+    post(
       '/runtime/process-instances',
       basic_auth: @@auth,
       body: start_process_request_body(process_key, form),
@@ -38,8 +40,8 @@ class Httparty
     )
   end
 
-  def getFormData(processId)
-    self.class.get(
+  def self.getFormData(processId)
+    get(
       '/form/form-data',
       basic_auth: @@auth,
       query: { processDefinitionId: processId },
@@ -47,7 +49,7 @@ class Httparty
     )
   end
 
-  def start_process_request_body(process_key, form)
+  def self.start_process_request_body(process_key, form)
     variables = []
     form.each { |k, v| variables << { name: k, value: v } }
     {
@@ -56,8 +58,8 @@ class Httparty
     }.to_json
   end
 
-  def deploy_process(process_data)
-    self.class.post(
+  def self.deploy_process(process_data)
+    post(
       '/repository/deployments',
       basic_auth: @@auth,
       multipart: true,
@@ -67,8 +69,8 @@ class Httparty
     )
   end
 
-  def bpm_tasks
-    hash_bpm_taks = self.class.get('/runtime/tasks', basic_auth: @@auth)
+  def self.bpm_tasks
+    hash_bpm_taks = get('/runtime/tasks', basic_auth: @@auth)
     tasks = []
     hash_bpm_taks["data"].each do |t|
       tasks << BpmTask.new(t)

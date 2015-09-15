@@ -1,6 +1,8 @@
 class BpmProcessInstancesController < ApplicationController
   unloadable
 
+  before_filter :authorize_global
+
   def new
     @form_data = ActivitiBpmService.getFormData(params[:bpm_process_definition_id])['formProperties']
   end

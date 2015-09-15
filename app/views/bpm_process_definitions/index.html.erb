@@ -34,11 +34,11 @@ function performUploadClick(node)
 </script>
 
 <div class="contextual">
-    <%= form_tag bpm_process_definitions_path, name: "upload_form", multipart: true do %>
-      <%= file_field_tag('bpm_process_definition[upload]', style: 'display: none;') %>
-      <%= link_to l('new_process'), '#', class:'icon icon-add', onclick: 'performUploadClick(document.getElementById("bpm_process_definition_upload"));' %>
-      <%= submit_tag('', style: 'display: none;')  %>
-    <% end %>
+  <%= form_tag bpm_process_definitions_path, name: "upload_form", multipart: true do %>
+    <%= file_field_tag('bpm_process_definition[upload]', style: 'display: none;') %>
+    <%= link_to l('new_process'), '#', class:'icon icon-add', onclick: 'performUploadClick(document.getElementById("bpm_process_definition_upload"));' %>
+    <%= submit_tag('', style: 'display: none;')  %>
+  <% end %>
 </div>
 
 <h2><%=l('bpm_processes')%></h2>
@@ -55,7 +55,7 @@ function performUploadClick(node)
 
     <% @process_list.each do |process| %>
       <tr>
-        <td><%= process.name %></td>
+        <td><%= link_to process.name, bpm_process_definition_path(process) %></td>
         <td><%= process.description %></td>
         <td><%= process.version %></td>
         <td><%= link_to l('start_process'), new_bpm_process_definition_bpm_process_instance_path(process) %></td>

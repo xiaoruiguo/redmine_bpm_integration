@@ -13,4 +13,7 @@ Redmine::Plugin.register :bpm_integration do
   menu :top_menu, :bpm_processes, { controller: 'bpm_process_definitions', action: 'index' } , caption: :bpm_processes
 
   settings default: {}, partial: 'settings/bpm_integration'
+
+  Tracker.send(:include, BpmIntegration::Patches::TrackerPatch) unless Tracker.included_modules.include? BpmIntegration::Patches::TrackerPatch
+
 end

@@ -12,7 +12,6 @@ class BpmProcessDefinitionsController < ApplicationController
       process_data = params[:bpm_process_definition][:upload].tempfile
       response = ActivitiBpmService.deploy_process(process_data)
       if !response.blank? && response.code == 201
-        Tracker.first_or_initialize
         handle_sucess('msg_process_uploaded')
       else
         handle_error('msg_process_upload_error')

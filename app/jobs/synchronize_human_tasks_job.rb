@@ -27,7 +27,7 @@ class SynchronizeHumanTasksJob < ActiveJob::Base
 
   def read_human_tasks
     mock_human_tasks
-    # ActivitiBpmService.new.bpm_tasks
+    # BpmTaskService.new.bpm_tasks
   end
 
   def mock_human_tasks

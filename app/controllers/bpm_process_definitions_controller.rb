@@ -1,16 +1,13 @@
-class BpmProcessDefinitionsController < ApplicationController
-  unloadable
-
-  before_filter :authorize_global
+class BpmProcessDefinitionsController < BpmController
 
   def index
-    @process_list = ActivitiBpmService.process_list
+    @process_list = BpmProcessService.process_list
   end
 
   def create
     begin
       process_data = params[:bpm_process_definition][:upload].tempfile
-      response = ActivitiBpmService.deploy_process(process_data)
+      response = BpmProcessService.deploy_process(process_data)
       if !response.blank? && response.code == 201
         handle_sucess('msg_process_uploaded')
       else
@@ -22,17 +19,8 @@ class BpmProcessDefinitionsController < ApplicationController
   end
 
   def show
-    process_image = ActivitiBpmService.process_image params[:id]
+    process_image = BpmProcessService.process_image params[:id]
     send_data process_image, :type => 'image/png',:disposition => 'inline'
   end
 
-  def handle_sucess(msg_code)
-    redirect_to :back, notice: l(msg_code)
-  end
-
-  def handle_error(msg_code)
-    logger.error response.code
-    logger.error response.body
-    redirect_to :back, alert: l(msg_code)
-  end
 end

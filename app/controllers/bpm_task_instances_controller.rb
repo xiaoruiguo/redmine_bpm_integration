@@ -1,0 +1,3 @@
+class BpmTaskInstancesController < BpmController
+
+end

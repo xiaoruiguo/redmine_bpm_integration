@@ -4,3 +4,5 @@
 resources :bpm_process_definitions, only: [:index, :create, :show, :new] do
   resources :bpm_process_instances, only: [:new, :create]
 end
+
+resources :bpm_process_instances, only: [:show]

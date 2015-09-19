@@ -31,6 +31,13 @@ class ActivitiBpmService
     ).body
   end
 
+  def self.process_instance_image(process_instance_id)
+    get(
+      '/runtime/process-instances/' + process_instance_id + '/diagram',
+      basic_auth: @@auth
+    ).body
+  end
+
   def self.start_process(process_key, form)
     post(
       '/runtime/process-instances',

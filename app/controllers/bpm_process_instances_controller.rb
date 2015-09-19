@@ -20,6 +20,11 @@ class BpmProcessInstancesController < ApplicationController
     end
   end
 
+  def show
+    process_image = ActivitiBpmService.process_instance_image params[:id]
+    send_data process_image, :type => 'image/png', :disposition => 'inline'
+  end
+
   def handle_sucess(msg_code)
     redirect_to :back, notice: l(msg_code)
   end

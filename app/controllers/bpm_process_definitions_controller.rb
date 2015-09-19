@@ -3,11 +3,6 @@ class BpmProcessDefinitionsController < ApplicationController
 
   before_filter :authorize_global
 
-  def show
-    process_image = ActivitiBpmService.process_image params[:id]
-    send_data process_image, :type => 'image/png',:disposition => 'inline'
-  end
-
   def index
     @process_list = ActivitiBpmService.process_list
   end
@@ -25,6 +20,11 @@ class BpmProcessDefinitionsController < ApplicationController
     rescue
       handle_error('msg_process_upload_error')
     end
+  end
+
+  def show
+    process_image = ActivitiBpmService.process_image params[:id]
+    send_data process_image, :type => 'image/png',:disposition => 'inline'
   end
 
   def handle_sucess(msg_code)

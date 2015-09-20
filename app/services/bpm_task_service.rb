@@ -11,11 +11,11 @@ class BpmTaskService < ActivitiBpmService
     return tasks
   end
 
-  def self.complete_task(task_id, variables)
+  def self.resolve_task(task_id, variables)
     post(
       '/runtime/tasks/' + task_id,
       basic_auth: @@auth,
-      body: { action: "complete", variables: variables },
+      body: { action: "complete", variables: variables }.to_json,
       headers: { 'Content-Type' => 'application/json' }
     )
   end

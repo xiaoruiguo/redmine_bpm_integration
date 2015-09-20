@@ -16,7 +16,8 @@ class SynchronizeHumanTasksJob < ActiveJob::Base
       issue.status_id = Setting.plugin_bpm_integration[:new_status].to_i
       issue.subject = task.name
       issue.description = task.description
-      issue.project_id = Project.find(task.formKey).id
+      # issue.project_id = Project.find(task.formKey).id
+      issue.project_id = mock_project
       user_assigned = User.find_by_login(task.assignee)
       unless (user_assigned = User.find_by_login(task.assignee)).nil?
         issue.assigned_to_id = user_assignee
@@ -47,4 +48,7 @@ class SynchronizeHumanTasksJob < ActiveJob::Base
     return 1
   end
 
+  def mock_project()
+    return Project.first.id
+  end
 end

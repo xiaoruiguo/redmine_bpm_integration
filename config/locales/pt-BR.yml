@@ -5,6 +5,9 @@ pt-BR:
       bpms_url: "URL"
       bpms_user: "Usuário"
       bpms_pass: "Senha"
+      bpms_closed_status: "Status Concluído"
+      bpms_doing_status: "Status Em andamento"
+      bpms_new_status: "Status Novo"
 
   #Processos
   process_name: 'Nome'

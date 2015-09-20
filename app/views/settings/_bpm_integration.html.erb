@@ -19,14 +19,14 @@
       </td>
     </tr>
     <tr>
-      <th>Status Novo:</th>
+      <th><%= t('bpm_integration.settings.bpms_new_status') %>:</th>
       <td>
         <%= select_tag 'settings[new_status]',
         options_from_collection_for_select(IssueStatus.all, 'id', 'name', settings['new_status']), include_blank: '' %>
       </td>
     </tr>
     <tr>
-      <th>Status Em Andamento:</th>
+      <th><%= t('bpm_integration.settings.bpms_doing_status') %>:</th>
       <td>
         <%= select_tag 'settings[doing_status]',
         options_from_collection_for_select(IssueStatus.all, 'id', 'name', settings['doing_status']), include_blank: '' %>
@@ -34,10 +34,10 @@
     </tr>
 
     <tr>
-      <th>Status Respondido:</th>
+      <th><%= t('bpm_integration.settings.bpms_closed_status') %>:</th>
       <td>
-        <%= select_tag 'settings[answered_status]',
-        options_from_collection_for_select(IssueStatus.all, 'id', 'name', settings['answered_status']), include_blank: '' %>
+        <%= select_tag 'settings[closed_status]',
+        options_from_collection_for_select(IssueStatus.all, 'id', 'name', settings['closed_status']), include_blank: '' %>
       </td>
     </tr>
 </table>

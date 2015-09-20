@@ -8,7 +8,6 @@ class SynchronizeHumanTasksJob < ActiveJob::Base
   protected
 
   def synchronize_tasks
-    binding.pry
     read_human_tasks.each do |task|
       return if BpmIntegration::HumanTaskIssue.where(human_task_id:task.id).first
       issue = Issue.new

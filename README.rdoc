@@ -5,7 +5,6 @@ This is a plugin for integrating Redmine with Activiti BPM.
 Check the 'Activiti BPM Webapp Example' to test this redmine plugin (https://github.com/thalestpires/activiti_bpm_example/).
 
 The Active Record backend requires a jobs table. You can create that table by running the following command:
-```ruby
-rails generate delayed_job:active_record
-rake db:migrate
-```
+
+  rails generate delayed_job:active_record
+  rake db:migrate

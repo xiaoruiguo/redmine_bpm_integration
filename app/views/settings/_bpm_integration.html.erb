@@ -18,4 +18,26 @@
         <input type="password" value="<%= settings['bpms_pass'] %>" name="settings[bpms_pass]">
       </td>
     </tr>
+    <tr>
+      <th>Status Novo:</th>
+      <td>
+        <%= select_tag 'settings[new_status]',
+        options_from_collection_for_select(IssueStatus.all, 'id', 'name', settings['new_status']), include_blank: '' %>
+      </td>
+    </tr>
+    <tr>
+      <th>Status Em Andamento:</th>
+      <td>
+        <%= select_tag 'settings[doing_status]',
+        options_from_collection_for_select(IssueStatus.all, 'id', 'name', settings['doing_status']), include_blank: '' %>
+      </td>
+    </tr>
+
+    <tr>
+      <th>Status Respondido:</th>
+      <td>
+        <%= select_tag 'settings[answered_status]',
+        options_from_collection_for_select(IssueStatus.all, 'id', 'name', settings['answered_status']), include_blank: '' %>
+      </td>
+    </tr>
 </table>

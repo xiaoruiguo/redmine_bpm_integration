@@ -15,6 +15,7 @@ Redmine::Plugin.register :bpm_integration do
   settings default: {}, partial: 'settings/bpm_integration'
 
   Tracker.send(:include, BpmIntegration::Patches::TrackerPatch) unless Tracker.included_modules.include? BpmIntegration::Patches::TrackerPatch
+  Issue.send(:include, BpmIntegration::Patches::IssuePatch) unless Issue.included_modules.include? BpmIntegration::Patches::IssuePatch
 
   # require_relative 'app/jobs/synchronize_human_tasks_job'
   # SynchronizeHumanTasksJob.perform_now(1)

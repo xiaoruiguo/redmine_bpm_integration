@@ -9,10 +9,15 @@ module BpmIntegration
           scope :human_task, -> { joins(:human_task_issue) }
 
           before_save :close_human_task, if: '!self.human_task_issue.blank? && self.status_id == Setting.plugin_bpm_integration[:closed_status].to_i'
+          before_save :start_process_instance, if: 'self.tracker.is_bpm_process?'
         end
       end
 
       module InstanceMethods
+
+        def start_process_instance
+          BpmProcessService.start_process(self.tracker.tracker_process_relation.process_definition_key, {})
+        end
 
         def close_human_task
           if Issue.find(self.id).status_id != Setting.plugin_bpm_integration[:closed_status].to_i

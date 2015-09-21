@@ -1,5 +1,15 @@
 class BpmProcessService < ActivitiBpmService
 
+  def self.process_definition(id)
+    process = get(
+      "/repository/process-definitions/#{id}",
+      query: { latest: true },
+      basic_auth: @@auth
+    )
+
+    BpmProcessDefinition.new(process)
+  end
+
   def self.process_list
     processes = []
     process_list = get(

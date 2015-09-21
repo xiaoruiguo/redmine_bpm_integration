@@ -1,0 +1,13 @@
+<div class="splitcontentleft">
+  <div class="box tabular">
+    <h4> <%= t(:title_process_definition_tracker) %> </h4>
+    <p>
+      <%= label_tag :tracker, "#{t(:label_tracker)} <span class='required'> *</span>".html_safe, class: 'bpm-form-label' %>
+      <%= select_tag :tracker,
+            options_from_collection_for_select(Tracker.all, :id, :name, @tracker_process_relation.tracker_id),
+            {required: true, include_blank: true}%>
+    </p>
+
+    <%= submit_tag t(:button_save) %>
+  </div>
+</div>

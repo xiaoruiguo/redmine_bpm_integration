@@ -58,7 +58,7 @@ function performUploadClick(node)
         <td><%= link_to process.name, bpm_process_definition_path(process) %></td>
         <td><%= process.description %></td>
         <td><%= process.version %></td>
-        <td><%= link_to l('start_process'), new_bpm_process_definition_bpm_process_instance_path(process) %></td>
+        <td><%= link_to t(:button_edit), edit_bpm_process_definition_path(process) %></td>
       </tr>
     <% end %>
   </table>

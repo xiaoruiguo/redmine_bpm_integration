@@ -1,7 +1,31 @@
 class BpmProcessDefinitionsController < BpmController
+  layout 'admin'
+
+  include Redmine::I18n
+
+  before_filter :require_admin
 
   def index
     @process_list = BpmProcessService.process_list
+  end
+
+  def edit
+    @process_definition = BpmProcessService.process_definition(params[:id])
+    @tracker_process_relation = BpmIntegration::TrackerProcessRelation
+                                  .where(process_definition_key: params[:id])
+                                  .first_or_initialize
+  end
+
+  def update
+    @process_definition = BpmProcessService.process_definition(params[:id])
+    @tracker_process_relation = BpmIntegration::TrackerProcessRelation
+                                  .where(process_definition_key: params[:id])
+                                  .first_or_initialize
+    @tracker_process_relation.tracker_id = params[:tracker]
+    @tracker_process_relation.save
+
+    flash[:notice] = t(:notice_successful_update)
+    redirect_to action: :edit
   end
 
   def create

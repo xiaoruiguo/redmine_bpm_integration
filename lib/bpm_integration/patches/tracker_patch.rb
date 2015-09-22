@@ -7,9 +7,9 @@ module BpmIntegration
 
         base.class_eval do
 
-          has_one :tracker_process_relation, class_name: 'BpmIntegration::TrackerProcessRelation', :dependent => :destroy
+          has_one :tracker_process_definition, class_name: 'BpmIntegration::TrackerProcessDefinition'
 
-          scope :bpm_processes, -> { joins(:tracker_process_relation) }
+          scope :bpm_processes, -> { joins(:tracker_process_definition) }
 
         end
       end
@@ -17,7 +17,7 @@ module BpmIntegration
       module InstanceMethods
 
         def is_bpm_process?
-          !self.tracker_process_relation.nil?
+          !self.tracker_process_definition.nil?
         end
 
       end

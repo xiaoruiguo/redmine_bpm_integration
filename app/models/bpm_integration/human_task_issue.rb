@@ -1,3 +1,3 @@
-class BpmIntegration::HumanTaskIssue < Bpmint
+class BpmIntegration::HumanTaskIssue < BpmIntegrationBaseModel
 
 end

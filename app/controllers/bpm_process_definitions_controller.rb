@@ -11,14 +11,14 @@ class BpmProcessDefinitionsController < BpmController
 
   def edit
     @process_definition = BpmProcessDefinitionService.process_definition(params[:id])
-    @tracker_process_relation = BpmIntegration::TrackerProcessRelation
+    @tracker_process_relation = BpmIntegration::TrackerProcessDefinition
                                   .where(process_definition_key: params[:id])
                                   .first_or_initialize
   end
 
   def update
     @process_definition = BpmProcessDefinitionService.process_definition(params[:id])
-    @tracker_process_relation = BpmIntegration::TrackerProcessRelation
+    @tracker_process_relation = BpmIntegration::TrackerProcessDefinition
                                   .where(process_definition_key: params[:id])
                                   .first_or_initialize
     @tracker_process_relation.tracker_id = params[:tracker]

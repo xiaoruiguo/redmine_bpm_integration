@@ -20,7 +20,7 @@ module BpmIntegration
         end
 
         def start_process_instance
-          BpmProcessInstanceService.start_process(self.tracker.tracker_process_relation.process_definition_key, self.id, {})
+          BpmProcessInstanceService.start_process(self.tracker.tracker_process_definition.process_definition_key, self.id, {})
           # TODO: tratar erro de criação e retornar uma mensagem decente
           # TODO: colocar status da tarefa pai em andamento
         end

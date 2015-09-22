@@ -6,18 +6,18 @@ class BpmProcessDefinitionsController < BpmController
   before_filter :require_admin
 
   def index
-    @process_list = BpmProcessService.process_list
+    @process_list = BpmProcessDefinitionService.process_list
   end
 
   def edit
-    @process_definition = BpmProcessService.process_definition(params[:id])
+    @process_definition = BpmProcessDefinitionService.process_definition(params[:id])
     @tracker_process_relation = BpmIntegration::TrackerProcessRelation
                                   .where(process_definition_key: params[:id])
                                   .first_or_initialize
   end
 
   def update
-    @process_definition = BpmProcessService.process_definition(params[:id])
+    @process_definition = BpmProcessDefinitionService.process_definition(params[:id])
     @tracker_process_relation = BpmIntegration::TrackerProcessRelation
                                   .where(process_definition_key: params[:id])
                                   .first_or_initialize
@@ -31,7 +31,7 @@ class BpmProcessDefinitionsController < BpmController
   def create
     begin
       process_data = params[:bpm_process_definition][:upload].tempfile
-      response = BpmProcessService.deploy_process(process_data)
+      response = BpmProcessDefinitionService.deploy_process(process_data)
       if !response.blank? && response.code == 201
         handle_sucess('msg_process_uploaded')
       else
@@ -43,7 +43,7 @@ class BpmProcessDefinitionsController < BpmController
   end
 
   def show
-    process_image = BpmProcessService.process_image params[:id]
+    process_image = BpmProcessDefinitionService.process_image params[:id]
     send_data process_image, :type => 'image/png',:disposition => 'inline'
   end
 

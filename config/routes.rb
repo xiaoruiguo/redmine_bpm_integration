@@ -2,7 +2,7 @@
 # See: http://guides.rubyonrails.org/routing.html
 
 resources :bpm_process_definitions, except: [:destroy] do
-  resources :bpm_process_instances, only: [:new, :create]
+  # resources :bpm_process_instances, only: [:show]
 end
 
 resources :bpm_process_instances, only: [:show]

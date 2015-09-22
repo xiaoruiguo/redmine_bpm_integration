@@ -16,22 +16,27 @@ class SynchronizeHumanTasksJob < ActiveJob::Base
       issue.status_id = Setting.plugin_bpm_integration[:new_status].to_i
       issue.subject = task.name
       issue.description = task.description
-      # issue.project_id = Project.find(task.formKey).id
-      issue.project_id = mock_project
-      user_assigned = User.find_by_login(task.assignee)
-      unless (user_assigned = User.find_by_login(task.assignee)).nil?
-        issue.assigned_to_id = user_assignee
+      issue.priority_id = IssuePriority.default.id
+
+      # TODO: validar atribuição ao principal
+      if task.assignee.is_a?(Integer) && !(user_assigned = Principal.where(id: task.assignee.to_i).first).blank?
+        issue.assigned_to_id = user_assigned.id
       end
 
-      # TODO: remove mock
+      # TODO: associar ao projeto da tarefa pai caso o formkey seja nulo (buscar pela businessKey)
+      issue.project_id = Project.find(task.formKey).id
+
+      # TODO: remover o mock do tracker_id: buscar pela configuração da tarefa
       issue.tracker_id = mock_parse_tracker(task.processDefinitionId)
+
+      # TODO: remover o mock do author_id: associar a um usuário de serviço criado no script de migração
       issue.author_id = mock_parse_author(task.owner)
 
-      # TODO: parent task
+      # TODO: associar a tarefa pai (buscar pela businessKey)
       # issue.parent_id = ???
 
       if issue.save!(validation: false)
-        puts "Issue " + issue.subject + " salva com sucesso"
+        puts "Issue " + issue.subject + " salva com sucesso."
       end
     end
   end
@@ -48,7 +53,4 @@ class SynchronizeHumanTasksJob < ActiveJob::Base
     return 1
   end
 
-  def mock_project()
-    return Project.first.id
-  end
 end

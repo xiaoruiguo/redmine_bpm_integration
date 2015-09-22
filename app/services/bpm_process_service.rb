@@ -39,20 +39,21 @@ class BpmProcessService < ActivitiBpmService
     ).body
   end
 
-  def self.start_process(process_key, form)
+  def self.start_process(process_key, business_key, form)
     post(
       '/runtime/process-instances',
       basic_auth: @@auth,
-      body: start_process_request_body(process_key, form),
+      body: start_process_request_body(process_key, business_key, form),
       headers: { 'Content-Type' => 'application/json' }
     )
   end
 
-  def self.start_process_request_body(process_key, form)
+  def self.start_process_request_body(process_key, business_key, form)
     variables = []
     form.each { |k, v| variables << { name: k, value: v } }
     {
       processDefinitionId: process_key,
+      businessKey: business_key,
       variables: variables
     }.to_json
   end

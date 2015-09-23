@@ -9,7 +9,7 @@ class SynchronizeHumanTasksJob < ActiveJob::Base
 
   def synchronize_tasks
     read_human_tasks.each do |task|
-      return if BpmIntegration::HumanTaskIssue.where(human_task_id:task.id).first
+      next if BpmIntegration::HumanTaskIssue.where(human_task_id:task.id).first
       issue = Issue.new
       issue.human_task_issue = BpmIntegration::HumanTaskIssue.new
       issue.human_task_issue.human_task_id = task.id

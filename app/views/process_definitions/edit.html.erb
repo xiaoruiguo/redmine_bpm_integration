@@ -1,0 +1,5 @@
+<%= title [l(:bpm_processes), process_definitions_path], @process_definition.name %>
+
+<%= form_for @process_definition, url: {action: "update"} do |f| %>
+<%= render :partial => 'form', :locals => { :f => f } %>
+<% end %>

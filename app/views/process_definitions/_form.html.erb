@@ -1,0 +1,20 @@
+<div class="splitcontentleft">
+  <div class="box tabular">
+    <h4> <%= t(:title_process_definition_tracker) %> </h4>
+    <p>
+      <%= label_tag :tracker, "#{t(:label_tracker)} <span class='required'> *</span>".html_safe, class: 'bpm-form-label' %>
+      <%= f.fields_for :tracker_process_definition do |tpd_form| %>
+        <%#= tpd_form.collection_select(:tracker_id, Tracker.all, :id, :name,
+                { selected: @process_definition.tracker_process_definition, required: true, include_blank: true}) %>
+        <%=
+        tpd_form.select(:tracker_id,
+              options_from_collection_for_select(
+                  Tracker.all, :id, :name, @process_definition.tracker_process_definition.tracker_id)
+              )
+               %>
+      <% end %>
+    </p>
+
+    <%= submit_tag t(:button_save) %>
+  </div>
+</div>

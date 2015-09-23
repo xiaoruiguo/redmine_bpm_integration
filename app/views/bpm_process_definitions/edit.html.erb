@@ -1,5 +1,0 @@
-<%= title [l(:bpm_processes), bpm_process_definitions_path], @process_definition.name %>
-
-<%= form_tag bpm_process_definition_path(@process_definition.id), method: :put, class: 'bpm-form' do %>
-<%= render :partial => 'form' %>
-<% end %>

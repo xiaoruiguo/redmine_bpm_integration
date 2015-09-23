@@ -1,6 +1,8 @@
+
 module BpmIntegration
   module Patches
     module IssuePatch
+
       def self.included(base) # :nodoc
         base.send(:include, InstanceMethods)
 
@@ -21,6 +23,8 @@ module BpmIntegration
 
         def start_process_instance
           BpmProcessInstanceService.start_process(self.tracker.tracker_process_definition.process_definition_key, self.id, {})
+          SynchronizeHumanTasksJob.perform_now()
+
           # TODO: tratar erro de criação e retornar uma mensagem decente
           # TODO: colocar status da tarefa pai em andamento
         end

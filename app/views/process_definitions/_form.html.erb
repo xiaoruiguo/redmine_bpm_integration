@@ -9,7 +9,8 @@
         <%=
         tpd_form.select(:tracker_id,
               options_from_collection_for_select(
-                  Tracker.all, :id, :name, @process_definition.tracker_process_definition.tracker_id)
+                  Tracker.all, :id, :name, @process_definition.tracker_process_definition.blank? ? nil :
+                                            @process_definition.tracker_process_definition.tracker_id)
               )
                %>
       <% end %>

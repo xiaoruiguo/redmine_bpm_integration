@@ -47,9 +47,10 @@ function performUploadClick(node)
 <div class="autoscroll">
   <table class="list issues">
     <tr>
-      <th><%=l('process_name')%></th>
-      <th><%=l('process_description')%></th>
-      <th><%=l('process_version')%></th>
+      <th><%=t(:process_name)%></th>
+      <th><%=t(:process_description)%></th>
+      <th><%=t(:label_tracker)%></th>
+      <th><%=t(:process_version)%></th>
       <th></th>
     </tr>
 
@@ -57,6 +58,7 @@ function performUploadClick(node)
       <tr>
         <td><%= link_to process.name, process_definition_path(process) %></td>
         <td><%= process.description %></td>
+        <td><%= process.try(&:tracker_process_definition).try(&:tracker).try(&:name) %></td>
         <td><%= process.version %></td>
         <td><%= link_to t(:button_edit), edit_process_definition_path(process) %></td>
       </tr>

@@ -7,7 +7,7 @@ class ProcessDefinitionsController < BpmController
   before_filter :require_admin
 
   def index
-    @process_definitions = BpmIntegration::ProcessDefinition.all
+    @process_definitions = BpmIntegration::ProcessDefinition.latest
   end
 
   def edit
@@ -25,11 +25,10 @@ class ProcessDefinitionsController < BpmController
     @process_definition.tracker_process_definition.update_attributes(
       params.require(:bpm_integration_process_definition).require(:tracker_process_definition).permit(:tracker_id)
     )
-    # @process_definition.save!
-    # @process_definition.tracker_process_definition.save!
+    @process_definition.save!
 
     flash[:notice] = t(:notice_successful_update)
-    redirect_to action: :edit
+    redirect_to action: :index
   end
 
   def create

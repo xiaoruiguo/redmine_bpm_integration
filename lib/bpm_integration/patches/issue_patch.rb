@@ -8,9 +8,10 @@ module BpmIntegration
 
         base.class_eval do
           has_one :human_task_issue, class_name: 'BpmIntegration::HumanTaskIssue', :dependent => :destroy
+          has_one :process_instance, class_name: 'BpmIntegration::IssueProcessInstance', :dependent => :destroy
           scope :human_task, -> { joins(:human_task_issue) }
 
-          after_create :start_process_instance, if: 'self.tracker.is_bpm_process? and !self.is_human_task?'
+          after_commit :start_process_instance, if: 'self.tracker.is_bpm_process? and self.process_instance.blank?'
           before_save :close_human_task
         end
       end
@@ -22,16 +23,22 @@ module BpmIntegration
         end
 
         def start_process_instance
+          self.process_instance ||= BpmIntegration::IssueProcessInstance.new
+          self.process_instance.save
+
           form_fields = self.tracker.process_definition.form_fields
           form_data = form_fields.map do |ff|
-            {
-              ff.field_id => (self.custom_field_values.select do |cfv|
+            field_value = (
+              self.custom_field_values.select do |cfv|
                 cfv.custom_field_id == ff.custom_field_id
-              end).first.value
-            }
+              end
+            ).first.value
+            field_value = field_value.gsub('=>',':') if (ff.custom_field.field_format == "grid")
+            { ff.field_id => field_value }
           end.reduce(&:merge)
-          BpmProcessInstanceService.start_process(
-              self.tracker.tracker_process_definition.process_definition_key, self.id, form_data)
+          post = BpmProcessInstanceService.start_process(
+              self.tracker.tracker_process_definition.process_definition_key, self.id, form_data
+          )
           SynchronizeHumanTasksJob.perform_now()
 
           # TODO: tratar erro de criação e retornar uma mensagem decente

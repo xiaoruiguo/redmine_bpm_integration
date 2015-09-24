@@ -19,8 +19,7 @@ class ProcessDefinitionsController < BpmController
   def update
     @process_definition = BpmIntegration::ProcessDefinition.find(params.require(:id))
     if @process_definition.tracker_process_definition_id.blank?
-      @process_definition.tracker_process_definition ||= BpmIntegration::TrackerProcessDefinition.new
-      @process_definition.tracker_process_definition.process_definition_key ||= @process_definition.key
+      @process_definition.tracker_process_definition ||= BpmIntegration::TrackerProcessDefinition.where(process_definition_key: @process_definition.key).first_or_initialize
     end
     @process_definition.tracker_process_definition.update_attributes(
       params.require(:bpm_integration_process_definition).require(:tracker_process_definition).permit(:tracker_id)

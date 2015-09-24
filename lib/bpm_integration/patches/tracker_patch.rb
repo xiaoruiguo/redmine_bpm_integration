@@ -17,7 +17,7 @@ module BpmIntegration
       module InstanceMethods
 
         def process_definition
-          self.tracker_process_definition.process_definitions.last
+          self.tracker_process_definition.process_definitions.order(:version).last
         end
 
         def is_bpm_process?

@@ -20,4 +20,12 @@ class BpmTaskService < ActivitiBpmService
     )
   end
 
+  def self.task_definitions(processId)
+    get(
+      "/repository/task-definitions/#{processId}",
+      basic_auth: @@auth,
+      headers: { 'Content-Type' => 'application/json' }
+    )['data']
+  end
+
 end

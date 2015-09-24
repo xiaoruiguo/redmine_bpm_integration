@@ -11,7 +11,7 @@ module BpmIntegration
           has_one :process_instance, class_name: 'BpmIntegration::IssueProcessInstance', :dependent => :destroy
           scope :human_task, -> { joins(:human_task_issue) }
 
-          after_commit :start_process_instance, if: 'self.tracker.is_bpm_process? and self.process_instance.blank?'
+          after_commit :start_process_instance, if: 'self.tracker.is_bpm_process? and !self.is_human_task?'
           before_save :close_human_task
         end
       end
@@ -27,15 +27,7 @@ module BpmIntegration
           self.process_instance.save
 
           form_fields = self.tracker.process_definition.form_fields
-          form_data = form_fields.map do |ff|
-            field_value = (
-              self.custom_field_values.select do |cfv|
-                cfv.custom_field_id == ff.custom_field_id
-              end
-            ).first.value
-            field_value = field_value.gsub('=>',':') if (ff.custom_field.field_format == "grid")
-            { ff.field_id => field_value }
-          end.reduce(&:merge)
+          form_data = form_values(form_fields)
           post = BpmProcessInstanceService.start_process(
               self.tracker.tracker_process_definition.process_definition_key, self.id, form_data
           )
@@ -50,7 +42,7 @@ module BpmIntegration
           if Issue.find(self.id).status_id != Setting.plugin_bpm_integration[:closed_status].to_i
               task_id = self.human_task_issue.human_task_id
               if !task_id.blank?
-                response = BpmTaskService.resolve_task(task_id,bpm_form_values)
+                response = BpmTaskService.resolve_task(task_id, bpm_form_values)
                 if response != nil && response.code == 200
                   puts "Tarefa completada no BPMS"
                 else
@@ -67,6 +59,20 @@ module BpmIntegration
         def bpm_form_values
           variables = []
           variables
+        end
+
+        private
+
+        def form_values(form_fields)
+          form_fields.map do |ff|
+            field_value = (
+              self.custom_field_values.select do |cfv|
+                cfv.custom_field_id == ff.custom_field.id
+              end
+            ).first.value
+            field_value = field_value.gsub('=>',':') if (ff.custom_field.field_format == "grid")
+            { ff.field_id => field_value }
+          end.reduce(&:merge)
         end
       end
     end

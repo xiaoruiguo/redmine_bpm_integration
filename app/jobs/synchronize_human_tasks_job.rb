@@ -13,6 +13,8 @@ class SynchronizeHumanTasksJob < ActiveJob::Base
       issue = Issue.new
       issue.human_task_issue = BpmIntegration::HumanTaskIssue.new
       issue.human_task_issue.human_task_id = task.id
+      issue.human_task_issue.task_definition = BpmIntegration::TaskDefinition.by_task_instance(
+                                                          task.taskDefinitionKey, task.processDefinitionId).first
       issue.status_id = Setting.plugin_bpm_integration[:new_status].to_i
       issue.subject = task.name
       issue.description = task.description

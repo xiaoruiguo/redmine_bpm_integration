@@ -2,6 +2,7 @@
 class BpmIntegration::ProcessDefinition < BpmIntegrationBaseModel
 
   belongs_to :tracker_process_definition
+  has_many :form_fields, class_name: 'BpmIntegration::ProcessFormField'
 
   scope :latest, -> {joins('join ' +
                             '(select pd.key as p_key, max(pd.version) as max_version ' +

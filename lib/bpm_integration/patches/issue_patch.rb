@@ -22,7 +22,16 @@ module BpmIntegration
         end
 
         def start_process_instance
-          BpmProcessInstanceService.start_process(self.tracker.tracker_process_definition.process_definition_key, self.id, {})
+          form_fields = self.tracker.process_definition.form_fields
+          form_data = form_fields.map do |ff|
+            {
+              ff.field_id => (self.custom_field_values.select do |cfv|
+                cfv.custom_field_id == ff.custom_field_id
+              end).first.value
+            }
+          end.reduce(&:merge)
+          BpmProcessInstanceService.start_process(
+              self.tracker.tracker_process_definition.process_definition_key, self.id, form_data)
           SynchronizeHumanTasksJob.perform_now()
 
           # TODO: tratar erro de criação e retornar uma mensagem decente

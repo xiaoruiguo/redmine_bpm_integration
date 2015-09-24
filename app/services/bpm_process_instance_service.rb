@@ -22,7 +22,7 @@ class BpmProcessInstanceService < ActivitiBpmService
     variables = []
     form.each { |k, v| variables << { name: k, value: v } }
     {
-      processDefinitionId: process_key,
+      processDefinitionKey: process_key,
       businessKey: business_key,
       variables: variables
     }.to_json

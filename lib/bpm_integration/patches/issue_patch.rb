@@ -28,13 +28,18 @@ module BpmIntegration
 
           form_fields = self.tracker.process_definition.form_fields
           form_data = form_values(form_fields)
-          post = BpmProcessInstanceService.start_process(
+          response = BpmProcessInstanceService.start_process(
               self.tracker.tracker_process_definition.process_definition_key, self.id, form_data
           )
+          if response.code != 201
+            logger.error response.code + l('msg_process_start_error')
+            raise l('msg_process_start_error')
+          end
           SynchronizeHumanTasksJob.perform_now()
 
           # TODO: tratar erro de criação e retornar uma mensagem decente
-          # TODO: colocar status da tarefa pai em andamento
+          self.status_id = Setting.plugin_bpm_integration[:doing_status].to_i
+
         end
 
         def close_human_task

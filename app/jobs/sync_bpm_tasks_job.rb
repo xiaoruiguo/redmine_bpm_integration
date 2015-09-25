@@ -1,4 +1,4 @@
-class SynchronizeHumanTasksJob < ActiveJob::Base
+class SyncBpmTasksJob < ActiveJob::Base
   queue_as :default
 
   def perform

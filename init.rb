@@ -18,7 +18,4 @@ Redmine::Plugin.register :bpm_integration do
   Issue.send(:include, BpmIntegration::Patches::IssuePatch) unless Issue.included_modules.include? BpmIntegration::Patches::IssuePatch
   CustomField.send(:include, BpmIntegration::Patches::CustomFieldPatch) unless CustomField.included_modules.include? BpmIntegration::Patches::CustomFieldPatch
 
-  require_relative 'app/jobs/synchronize_human_tasks_job'
-  # SynchronizeHumanTasksJob.perform_now(1)
-
 end

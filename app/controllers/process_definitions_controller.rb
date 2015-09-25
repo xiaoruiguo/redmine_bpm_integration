@@ -2,11 +2,12 @@ class ProcessDefinitionsController < BpmController
   layout 'admin'
 
   include Redmine::I18n
-  require_relative '../jobs/synchronize_process_definitions_job'
+  require_relative '../jobs/sync_process_definitions_job'
 
   before_filter :require_admin
 
   def index
+    SyncProcessDefinitionsJob.perform_now
     @process_definitions = BpmIntegration::ProcessDefinition.latest
   end
 
@@ -35,7 +36,7 @@ class ProcessDefinitionsController < BpmController
       process_data = params[:bpm_process_definition][:upload].tempfile
       response = BpmProcessDefinitionService.deploy_process(process_data)
       if !response.blank? && response.code == 201
-        SynchronizeProcessDefinitionsJob.perform_now
+        SyncProcessDefinitionsJob.perform_now
         handle_sucess('msg_process_uploaded')
       else
         handle_error('msg_process_upload_error')

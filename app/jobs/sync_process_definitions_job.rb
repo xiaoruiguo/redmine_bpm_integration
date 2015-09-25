@@ -1,4 +1,4 @@
-class SynchronizeProcessDefinitionsJob < ActiveJob::Base
+class SyncProcessDefinitionsJob < ActiveJob::Base
   queue_as :default
 
   def perform

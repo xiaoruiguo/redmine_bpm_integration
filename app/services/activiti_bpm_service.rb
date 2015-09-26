@@ -9,4 +9,10 @@ class ActivitiBpmService
     password: Setting.plugin_bpm_integration[:bpms_pass]
   }
 
+  def self.variables_from_hash(form)
+    variables = []
+    form.each { |k, v| variables << { name: k, value: v } }
+    variables
+  end
+
 end

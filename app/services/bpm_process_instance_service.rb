@@ -20,11 +20,10 @@ class BpmProcessInstanceService < ActivitiBpmService
 
   def self.start_process_request_body(process_key, business_key, form)
     variables = []
-    form.each { |k, v| variables << { name: k, value: v } }
     {
       processDefinitionKey: process_key,
       businessKey: business_key,
-      variables: variables
+      variables: variables_from_hash(form)
     }.to_json
   end
 

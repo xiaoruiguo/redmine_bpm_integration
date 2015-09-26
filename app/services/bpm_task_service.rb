@@ -15,7 +15,7 @@ class BpmTaskService < ActivitiBpmService
     post(
       '/runtime/tasks/' + task_id,
       basic_auth: @@auth,
-      body: { action: "complete", variables: variables }.to_json,
+      body: resolve_task_request_body(variables),
       headers: { 'Content-Type' => 'application/json' }
     )
   end
@@ -26,6 +26,15 @@ class BpmTaskService < ActivitiBpmService
       basic_auth: @@auth,
       headers: { 'Content-Type' => 'application/json' }
     )['data']
+  end
+
+  private
+
+  def self.resolve_task_request_body(form)
+    {
+      action: "complete",
+      variables: variables_from_hash(form)
+    }.to_json
   end
 
 end

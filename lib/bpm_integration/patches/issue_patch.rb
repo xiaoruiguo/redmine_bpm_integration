@@ -31,7 +31,9 @@ module BpmIntegration
           if Issue.find(self.id).status_id != Setting.plugin_bpm_integration[:closed_status].to_i
               task_id = self.human_task_issue.human_task_id
               if !task_id.blank?
-                response = BpmTaskService.resolve_task(task_id, bpm_form_values)
+                form_fields = self.human_task_issue.form_fields
+                form_data = form_values(form_fields)
+                response = BpmTaskService.resolve_task(task_id, form_data)
                 if response != nil && response.code == 200
                   puts "Tarefa Ocorreu um erro ao tentar iniciar um novo processo.completada no BPMS"
                 else
@@ -42,16 +44,27 @@ module BpmIntegration
                 end
               end
           end
+          SyncBpmTasksJob.perform_now()
           # TODO: verificar se o processo terminou -> concluir a tarefa original
-        end
-
-        def bpm_form_values
-          variables = []
-          variables
         end
 
         private
 
+        def form_values(form_fields)
+          form_fields ||= []
+          hash_fields = form_fields.map do |ff|
+            field_value = (
+              self.custom_field_values.select do |cfv|
+                ff.custom_field && (cfv.custom_field_id == ff.custom_field.id)
+              end
+            ).first.try(&:value)
+            if field_value
+              field_value = field_value.gsub('=>',':') if (ff.custom_field.field_format == "grid")
+            end
+            { ff.field_id => field_value }
+          end
+          hash_fields.reduce(&:merge)
+        end
 
       end
     end

@@ -2,7 +2,6 @@ class ProcessDefinitionsController < BpmController
   layout 'admin'
 
   include Redmine::I18n
-  require_relative '../jobs/sync_process_definitions_job'
 
   before_filter :require_admin
 

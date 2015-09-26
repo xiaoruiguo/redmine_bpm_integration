@@ -8,10 +8,9 @@ module BpmIntegration
 
         base.class_eval do
           has_one :human_task_issue, class_name: 'BpmIntegration::HumanTaskIssue', :dependent => :destroy
-          has_one :process_instance, class_name: 'BpmIntegration::IssueProcessInstance', :dependent => :destroy
           scope :human_task, -> { joins(:human_task_issue) }
 
-          after_commit :start_process_instance, if: 'self.tracker.is_bpm_process? and !self.is_human_task?'
+          after_commit :start_process_instance, if: 'self.tracker.is_bpm_process? and !self.is_human_task?', on: :create
           before_save :close_human_task
         end
       end
@@ -23,9 +22,6 @@ module BpmIntegration
         end
 
         def start_process_instance
-          self.process_instance ||= BpmIntegration::IssueProcessInstance.new
-          self.process_instance.save
-
           form_fields = self.tracker.process_definition.form_fields
           form_data = form_values(form_fields)
           response = BpmProcessInstanceService.start_process(
@@ -35,7 +31,7 @@ module BpmIntegration
             logger.error response.code + l('msg_process_start_error')
             raise l('msg_process_start_error')
           end
-          SynchronizeHumanTasksJob.perform_now()
+          SyncBpmTasksJob.perform_now()
 
           # TODO: tratar erro de criação e retornar uma mensagem decente
           self.status_id = Setting.plugin_bpm_integration[:doing_status].to_i

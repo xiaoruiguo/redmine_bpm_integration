@@ -3,6 +3,10 @@ Rails.configuration.to_prepare do
      .autoload_paths << File.expand_path('../app/services', __FILE__)
 end
 
+require_relative './app/jobs/sync_process_definitions_job'
+require_relative './app/jobs/sync_bpm_tasks_job'
+
+
 Redmine::Plugin.register :bpm_integration do
   name 'BPM Integration Plugin'
   author 'Filipe Xavier, Lucas Arnaud, Thales Pires'

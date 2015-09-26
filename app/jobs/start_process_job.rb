@@ -10,7 +10,6 @@ class StartProcessJob < ActiveJob::Base
   protected
 
   def start_bpm_process(issue_id)
-    binding.pry
     issue = Issue.find(issue_id)
     begin
       form_fields = issue.tracker.process_definition.form_fields

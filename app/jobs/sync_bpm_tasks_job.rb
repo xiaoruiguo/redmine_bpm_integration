@@ -27,7 +27,8 @@ class SyncBpmTasksJob < ActiveJob::Base
       end
 
       # TODO: associar ao projeto da tarefa pai caso o formkey seja nulo (buscar pela businessKey)
-      issue.project_id = Project.find(task.formKey).id
+      issue.project_id = get_task_project(task)
+      next if issue.project_id.blank?
 
       # TODO: remover o mock do tracker_id: buscar pela configuração da tarefa
       issue.tracker_id = mock_parse_tracker(task.processDefinitionId)
@@ -36,9 +37,20 @@ class SyncBpmTasksJob < ActiveJob::Base
       # issue.parent_id = ???
 
       if issue.save!(validation: false)
-        puts "Issue " + issue.subject + " salva com sucesso."
+        p "[INFO] Issue " + issue.subject + " salva com sucesso."
       end
     end
+  end
+
+  def get_task_project(task)
+    project = Project.where(id: task.formKey).first
+    return project unless project.blank?
+    process_instance = BpmProcessInstanceService.process_instance(task.processInstanceId)
+    if logger.error.blank?
+      p "[ERROR] Não foi possível criar a human_task " + task.id
+      return nil
+    end
+    Issue.find(process_instance.businessKey.to_i).project_id
   end
 
   def read_human_tasks

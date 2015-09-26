@@ -11,7 +11,7 @@ class BpmController < ApplicationController
     logger.error response.code
     logger.error response.body
     logger.error error
-    redirect_to :back, alert: l(msg_code)
+    redirect_to :back, flash: {error: l(msg_code)}
   end
 
 end

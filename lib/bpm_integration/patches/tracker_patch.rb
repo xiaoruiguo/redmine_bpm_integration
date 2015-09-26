@@ -8,6 +8,7 @@ module BpmIntegration
         base.class_eval do
 
           has_one :tracker_process_definition, class_name: 'BpmIntegration::TrackerProcessDefinition'
+          # has_many :tracker_process_definition, class_name: 'BpmIntegration::TrackerProcessDefinition', :dependent => :destroy
 
           scope :bpm_processes, -> { joins(:tracker_process_definition) }
 

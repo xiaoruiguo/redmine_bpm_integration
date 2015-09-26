@@ -1,5 +1,13 @@
 class BpmProcessInstanceService < ActivitiBpmService
 
+  def self.process_instance(process_instance_id)
+    hash_bpm_processes = get(
+      '/runtime/process-instances/' + process_instance_id,
+      basic_auth: @@auth
+    )
+    BpmProcessInstance.new(hash_bpm_processes)
+  end
+
   def self.process_instance_image(process_instance_id)
     get(
       '/runtime/process-instances/' + process_instance_id + '/diagram',

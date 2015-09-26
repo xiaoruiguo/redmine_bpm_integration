@@ -22,20 +22,8 @@ module BpmIntegration
         end
 
         def start_process_instance
-          form_fields = self.tracker.process_definition.form_fields
-          form_data = form_values(form_fields)
-          response = BpmProcessInstanceService.start_process(
-              self.tracker.tracker_process_definition.process_definition_key, self.id, form_data
-          )
-          if response.code != 201
-            logger.error response.code + l('msg_process_start_error')
-            raise l('msg_process_start_error')
-          end
-          SyncBpmTasksJob.perform_now()
-
-          # TODO: tratar erro de criação e retornar uma mensagem decente
-          self.status_id = Setting.plugin_bpm_integration[:doing_status].to_i
-
+          require_relative('../../../app/jobs/start_process_job')
+          StartProcessJob.perform_now(self.id)
         end
 
         def close_human_task
@@ -45,7 +33,7 @@ module BpmIntegration
               if !task_id.blank?
                 response = BpmTaskService.resolve_task(task_id, bpm_form_values)
                 if response != nil && response.code == 200
-                  puts "Tarefa completada no BPMS"
+                  puts "Tarefa Ocorreu um erro ao tentar iniciar um novo processo.completada no BPMS"
                 else
                   puts "Ocorreu um problema ao completar tarefa no BPMS. " + response.response.code + " - " + response.response.msg
                   begin
@@ -64,17 +52,7 @@ module BpmIntegration
 
         private
 
-        def form_values(form_fields)
-          form_fields.map do |ff|
-            field_value = (
-              self.custom_field_values.select do |cfv|
-                cfv.custom_field_id == ff.custom_field.id
-              end
-            ).first.value
-            field_value = field_value.gsub('=>',':') if (ff.custom_field.field_format == "grid")
-            { ff.field_id => field_value }
-          end.reduce(&:merge)
-        end
+
       end
     end
   end

@@ -19,6 +19,7 @@ class SyncBpmTasksJob < ActiveJob::Base
       issue.subject = task.name
       issue.description = task.description
       issue.priority_id = IssuePriority.default.id
+      issue.author_id = Setting.plugin_bpm_integration[:bpm_user].to_i
 
       # TODO: validar atribuição ao principal
       if task.assignee.is_a?(Integer) && !(user_assigned = Principal.where(id: task.assignee.to_i).first).blank?
@@ -30,9 +31,6 @@ class SyncBpmTasksJob < ActiveJob::Base
 
       # TODO: remover o mock do tracker_id: buscar pela configuração da tarefa
       issue.tracker_id = mock_parse_tracker(task.processDefinitionId)
-
-      # TODO: remover o mock do author_id: associar a um usuário de serviço criado no script de migração
-      issue.author_id = mock_parse_author(task.owner)
 
       # TODO: associar a tarefa pai (buscar pela businessKey)
       # issue.parent_id = ???

@@ -8,6 +8,7 @@ pt-BR:
       bpms_closed_status: "Status Concluído"
       bpms_doing_status: "Status Em andamento"
       bpms_new_status: "Status Novo"
+      bpms_error_status: "Status Erro"
 
   #Processos
   process_name: 'Nome'

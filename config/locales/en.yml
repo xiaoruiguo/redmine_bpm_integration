@@ -5,9 +5,10 @@ en:
       bpms_url: "URL"
       bpms_user: "User"
       bpms_pass: "Password"
-      bpms_closed_status: "Closed Status"
-      bpms_doing_status: "Doing Status"
-      bpms_new_status: "New Status"
+      bpms_closed_status: "Status Closed"
+      bpms_doing_status: "Status Doing"
+      bpms_new_status: "Status New"
+      bpms_error_status: "Status Error"
 
   #Processes
   process_name: 'Name'

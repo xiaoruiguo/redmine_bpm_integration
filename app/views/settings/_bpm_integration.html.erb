@@ -40,4 +40,12 @@
         options_from_collection_for_select(IssueStatus.all, 'id', 'name', settings['closed_status']), include_blank: '' %>
       </td>
     </tr>
+
+    <tr>
+      <th><%= t('bpm_integration.settings.bpms_error_status') %>:</th>
+      <td>
+        <%= select_tag 'settings[error_status]',
+        options_from_collection_for_select(IssueStatus.all, 'id', 'name', settings['error_status']), include_blank: '' %>
+      </td>
+    </tr>
 </table>

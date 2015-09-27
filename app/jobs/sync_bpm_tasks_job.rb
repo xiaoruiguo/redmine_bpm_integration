@@ -57,10 +57,6 @@ class SyncBpmTasksJob < ActiveJob::Base
     BpmTaskService.task_list
   end
 
-  def mock_parse_author(owner)
-    return 1
-  end
-
   def mock_parse_tracker(process_id)
     return 1
   end

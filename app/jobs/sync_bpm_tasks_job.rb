@@ -21,17 +21,14 @@ class SyncBpmTasksJob < ActiveJob::Base
       issue.priority_id = IssuePriority.default.id
       issue.author_id = Setting.plugin_bpm_integration[:bpm_user].to_i
 
-      # TODO: validar atribuição ao principal
       if task.assignee.is_a?(Integer) && !(user_assigned = Principal.where(id: task.assignee.to_i).first).blank?
         issue.assigned_to_id = user_assigned.id
       end
 
-      # TODO: associar ao projeto da tarefa pai caso o formkey seja nulo (buscar pela businessKey)
       issue.project_id = get_task_project(task)
       next if issue.project_id.blank?
 
-      # TODO: remover o mock do tracker_id: buscar pela configuração da tarefa
-      issue.tracker_id = mock_parse_tracker(task.processDefinitionId)
+      issue.tracker_id = get_tracker(task.processDefinitionId)
 
       # TODO: associar a tarefa pai (buscar pela businessKey)
       # issue.parent_id = ???
@@ -57,8 +54,13 @@ class SyncBpmTasksJob < ActiveJob::Base
     BpmTaskService.task_list
   end
 
-  def mock_parse_tracker(process_id)
-    return 1
+  def get_tracker(process_id)
+    begin
+      tracker_process = BpmIntegration::ProcessDefinition.where(process_identifier: process_id).first
+      tracker_process.tracker_process_definition.tracker_id
+    rescue
+      return nil
+    end
   end
 
 end

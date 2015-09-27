@@ -28,6 +28,15 @@ class BpmTaskService < ActivitiBpmService
     )['data']
   end
 
+  def self.form_data(taskId)
+    get(
+      '/form/form-data',
+      basic_auth: @@auth,
+      query: { taskId: taskId },
+      headers: { 'Content-Type' => 'application/json' }
+    )
+  end
+
   private
 
   def self.resolve_task_request_body(form)

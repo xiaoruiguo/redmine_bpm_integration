@@ -14,8 +14,9 @@ class SyncBpmTasksJob < ActiveJob::Base
         issue = Issue.new
         issue.human_task_issue = BpmIntegration::HumanTaskIssue.new
         issue.human_task_issue.human_task_id = task.id
-        issue.human_task_issue.task_definition = BpmIntegration::TaskDefinition.by_task_instance(
+        task_definition = BpmIntegration::TaskDefinition.by_task_instance(
                                                             task.taskDefinitionKey, task.processDefinitionId).first
+        issue.human_task_issue.task_definition = task_definition
         issue.status_id = Setting.plugin_bpm_integration[:new_status].to_i
         issue.subject = task.name
         issue.description = task.description
@@ -30,6 +31,14 @@ class SyncBpmTasksJob < ActiveJob::Base
         issue.parent = process_parent_issue
 
         issue.tracker_id = get_tracker(task.processDefinitionId)
+
+        form_fields_data = task_form_data(task.id)['formProperties']
+        custom_field_values = []
+        task_definition.form_fields.each do |ff|
+          ff_data = form_fields_data.select { |ffd| ffd["id"] == ff.field_id }.first
+          custom_field_values << { id: ff.custom_field.id, value: ff_data["value"] }
+        end
+        issue.custom_fields = custom_field_values
 
         if issue.save(validation: false)
           p "[INFO] Issue " + issue.subject + " salva com sucesso."
@@ -61,6 +70,10 @@ class SyncBpmTasksJob < ActiveJob::Base
       logger.error e.to_s
       []
     end
+  end
+
+  def task_form_data(taskId)
+    BpmTaskService.form_data(taskId)
   end
 
   def get_tracker(process_id)

@@ -5,12 +5,12 @@ module BpmIntegration
 
       require_relative '../../../app/jobs/sync_bpm_tasks_job'
       require_relative '../../../app/jobs/sync_process_instances_job'
-      
+
       def self.included(base) # :nodoc
         base.send(:include, InstanceMethods)
 
         base.class_eval do
-          has_one :human_task_issue, class_name: 'BpmIntegration::HumanTaskIssue', :dependent => :destroy
+          has_one :human_task_issue, class_name: 'BpmIntegration::HumanTaskIssue', autosave: true, :dependent => :destroy
           scope :human_task, -> { joins(:human_task_issue) }
 
           has_one :process_instance, class_name: 'BpmIntegration::IssueProcessInstance', :dependent => :destroy
@@ -44,7 +44,7 @@ module BpmIntegration
                 form_data = form_values(form_fields)
                 response = BpmTaskService.resolve_task(task_id, form_data)
                 if response != nil && response.code == 200
-                  puts "Tarefa Ocorreu um erro ao tentar iniciar um novo processo.completada no BPMS"
+                  puts "Tarefa completada no BPMS"
                 else
                   puts "Ocorreu um problema ao completar tarefa no BPMS. " + response.response.code + " - " + response.response.msg
                   begin

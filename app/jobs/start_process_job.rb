@@ -18,13 +18,15 @@ class StartProcessJob < ActiveJob::Base
           issue.tracker.tracker_process_definition.process_definition_key, issue.id, form_data
       )
       if response && response.id
+        issue.reload
         issue.process_instance ||= BpmIntegration::IssueProcessInstance.new
         issue.process_instance.process_instance_id = response.id
         issue.process_instance.completed = false
         issue.process_instance.save!(validate:false)
         issue.status_id = Setting.plugin_bpm_integration[:doing_status].to_i
-        issue.save(validate:false)
-        p 'Processo Iniciado com sucesso'
+
+        issue.save!(validate:false)
+        p "[StartProcessJob - INFO] Issue \##{issue.id} -  Processo Iniciado com sucesso"
         SyncBpmTasksJob.perform_now
       else
         handle_error(issue, l('msg_process_start_error'))
@@ -56,7 +58,7 @@ class StartProcessJob < ActiveJob::Base
     issue.status_id = Setting.plugin_bpm_integration[:error_status].to_i
     issue.save(validate:false)
     Journal.new(:journalized => issue, :user => user, :notes => l('msg_process_start_error')).save
-    Journal.new(:journalized => issue, :user => user, :notes => exception.to_s, :private_notes => true).save
+    Journal.new(:journalized => issue, :user => user, :notes => "[StartProcessJob - FATAL] #{exception.to_s}", :private_notes => true).save
   end
 
 end

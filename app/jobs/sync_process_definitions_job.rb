@@ -21,10 +21,10 @@ class SyncProcessDefinitionsJob < ActiveJob::Base
 
       new_process.task_definitions = synchronize_task_definitions(new_process)
 
-      if new_process.save!(validate:false)
-        p 'Processo ' + new_process.id.to_s + ' salvo com sucesso!'
+      if new_process.save(validate:false)
+        p '[StartProcessJob - INFO] Deploy de definição do processo ' + new_process.id.to_s + ' realizado com sucesso!'
       else
-        p 'Ocorreu um erro ao salvar o processo ' + new_process.id.to_s
+        p '[StartProcessJob - ERROR] Ocorreu um erro ao realizar deploy do processo ' + new_process.id.to_s
       end
     end
   end

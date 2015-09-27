@@ -16,12 +16,13 @@ class BpmProcessInstanceService < ActivitiBpmService
   end
 
   def self.start_process(process_key, business_key, form)
-    post(
+    hash_process_instance = post(
       '/runtime/process-instances',
       basic_auth: @@auth,
       body: start_process_request_body(process_key, business_key, form),
       headers: { 'Content-Type' => 'application/json' }
     )
+    BpmProcessInstance.new(hash_process_instance)
   end
 
   private

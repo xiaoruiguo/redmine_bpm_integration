@@ -17,12 +17,16 @@ class StartProcessJob < ActiveJob::Base
       response = BpmProcessInstanceService.start_process(
           issue.tracker.tracker_process_definition.process_definition_key, issue.id, form_data
       )
-      if response.code != 201
-        handle_error(issue, response)
-      else
+      if response && response.id
+        issue.process_instance ||= BpmIntegration::IssueProcessInstance.new
+        issue.process_instance.process_instance_id = response.id
+        issue.process_instance.save!(validate:false)
         issue.status_id = Setting.plugin_bpm_integration[:doing_status].to_i
         issue.save(validate:false)
+        p 'Processo Iniciado com sucesso'
         SyncBpmTasksJob.perform_later
+      else
+        handle_error(issue, l('msg_process_start_error'))
       end
     rescue => exception
       handle_error(issue, exception)

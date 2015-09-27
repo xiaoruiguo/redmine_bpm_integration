@@ -10,6 +10,8 @@ module BpmIntegration
           has_one :human_task_issue, class_name: 'BpmIntegration::HumanTaskIssue', :dependent => :destroy
           scope :human_task, -> { joins(:human_task_issue) }
 
+          has_one :process_instance, class_name: 'BpmIntegration::IssueProcessInstance', :dependent => :destroy
+
           after_commit :start_process_instance, if: 'self.tracker.is_bpm_process? and !self.is_human_task?', on: :create
           before_save :close_human_task
         end

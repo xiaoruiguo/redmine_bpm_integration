@@ -21,6 +21,8 @@ en:
   msg_process_start_error: 'An error ocurred while trying to start a new process.'
   msg_process_uploaded: 'The process definition was successfully uploaded!'
   msg_process_upload_error: 'An error ocurred while trying to upload a new process definition.'
+  title_process_definition_tracker: 'Tracker that represents the process'
+  title_process_definition_custom_fields: 'Custom fields used by the process'
 
   #Tasks
   bpm_tasks: 'BPM Tasks'

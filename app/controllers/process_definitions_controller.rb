@@ -24,6 +24,11 @@ class ProcessDefinitionsController < BpmController
     @process_definition.tracker_process_definition.update_attributes(
       params.require(:bpm_integration_process_definition).require(:tracker_process_definition).permit(:tracker_id)
     )
+
+    @process_definition.form_field_definitions.each do |ffd|
+      ffd.custom_field_id = params[:bpm_integration_process_definition][:form_field_definitions][ffd.id.to_s]
+    end
+
     @process_definition.save!
 
     flash[:notice] = t(:notice_successful_update)

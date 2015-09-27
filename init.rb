@@ -19,6 +19,7 @@ Redmine::Plugin.register :bpm_integration do
   settings default: {}, partial: 'settings/bpm_integration'
 
   require 'bpm_integration/hooks/process_instance_hook_listener'
+  require 'bpm_integration/hooks/issue_hook_listener'
 
   Tracker.send(:include, BpmIntegration::Patches::TrackerPatch) unless Tracker.included_modules.include? BpmIntegration::Patches::TrackerPatch
   Issue.send(:include, BpmIntegration::Patches::IssuePatch) unless Issue.included_modules.include? BpmIntegration::Patches::IssuePatch

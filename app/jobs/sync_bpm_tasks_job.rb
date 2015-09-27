@@ -32,13 +32,13 @@ class SyncBpmTasksJob < ActiveJob::Base
         issue.tracker_id = get_tracker(task.processDefinitionId)
 
         if issue.save(validation: false)
-            p "[INFO] Issue " + issue.subject + " salva com sucesso."
+          p "[INFO] Issue " + issue.subject + " salva com sucesso."
         else
           p "[ERROR] " + issue.errors.messages
         end
       rescue => exception
         logger.error exception
-        p exception
+        p "[ERROR]" + exception.to_s
       end
     end
   end
@@ -55,7 +55,12 @@ class SyncBpmTasksJob < ActiveJob::Base
   end
 
   def read_human_tasks
-    BpmTaskService.task_list
+    begin
+      BpmTaskService.task_list
+    rescue => e
+      logger.error e.to_s
+      []
+    end
   end
 
   def get_tracker(process_id)

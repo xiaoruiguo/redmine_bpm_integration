@@ -22,7 +22,7 @@ class StartProcessJob < ActiveJob::Base
       else
         issue.status_id = Setting.plugin_bpm_integration[:doing_status].to_i
         issue.save(validate:false)
-        SyncBpmTasksJob.perform_now()
+        SyncBpmTasksJob.perform_later
       end
     rescue => exception
       handle_error(issue, exception)

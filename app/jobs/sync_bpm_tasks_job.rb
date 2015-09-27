@@ -25,33 +25,33 @@ class SyncBpmTasksJob < ActiveJob::Base
         if task.assignee.is_a?(Integer) && !(user_assigned = Principal.where(id: task.assignee.to_i).first).blank?
           issue.assigned_to_id = user_assigned.id
         end
-
-        issue.project_id = get_task_project(task)
-        next if issue.project_id.blank?
+        process_parent_issue = get_process_parent_issue(task)
+        issue.project_id = process_parent_issue.project_id
+        issue.parent = process_parent_issue
 
         issue.tracker_id = get_tracker(task.processDefinitionId)
 
-        # TODO: associar a tarefa pai (buscar pela businessKey)
-        # issue.parent_id = ???
-
-        if issue.save!(validation: false)
-          p "[INFO] Issue " + issue.subject + " salva com sucesso."
+        if issue.save(validation: false)
+            p "[INFO] Issue " + issue.subject + " salva com sucesso."
+        else
+          p "[ERROR] " + issue.errors.messages
         end
-      rescue => e
-        logger.error e
+      rescue => exception
+        logger.error exception
+        p exception
       end
     end
   end
 
-  def get_task_project(task)
+  def get_process_parent_issue(task)
     project = Project.where(id: task.formKey).first
     return project unless project.blank?
-    process_instance = BpmProcessInstanceService.process_instance(task.processInstanceId)
-    if logger.error.blank?
+    result = Issue.by_process_instance(task.processInstanceId)
+    if result.empty?
       p "[ERROR] Não foi possível criar a human_task " + task.id
       return nil
     end
-    Issue.find(process_instance.businessKey.to_i).project_id
+    result.first
   end
 
   def read_human_tasks

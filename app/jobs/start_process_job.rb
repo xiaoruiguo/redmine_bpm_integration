@@ -24,7 +24,7 @@ class StartProcessJob < ActiveJob::Base
         issue.status_id = Setting.plugin_bpm_integration[:doing_status].to_i
         issue.save(validate:false)
         p 'Processo Iniciado com sucesso'
-        SyncBpmTasksJob.perform_later
+        SyncBpmTasksJob.perform_now
       else
         handle_error(issue, l('msg_process_start_error'))
       end

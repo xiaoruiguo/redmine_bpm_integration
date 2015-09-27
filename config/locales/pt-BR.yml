@@ -17,6 +17,7 @@ pt-BR:
   new_process: 'Novo processo'
   bpm_processes: 'Processos BPM'
   start_process: 'Iniciar'
+  view_process_instance: 'Visualizar andamento do processo'
   msg_process_started: 'O processo foi iniciado com sucesso!'
   msg_process_start_error: 'Ocorreu um erro ao iniciar um novo processo.'
   msg_process_uploaded: 'A definição de processo foi carregada com sucesso!'

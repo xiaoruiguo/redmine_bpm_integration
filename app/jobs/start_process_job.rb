@@ -20,6 +20,7 @@ class StartProcessJob < ActiveJob::Base
       if response && response.id
         issue.process_instance ||= BpmIntegration::IssueProcessInstance.new
         issue.process_instance.process_instance_id = response.id
+        issue.process_instance.completed = false
         issue.process_instance.save!(validate:false)
         issue.status_id = Setting.plugin_bpm_integration[:doing_status].to_i
         issue.save(validate:false)

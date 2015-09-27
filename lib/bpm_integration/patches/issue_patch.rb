@@ -3,6 +3,9 @@ module BpmIntegration
   module Patches
     module IssuePatch
 
+      require_relative '../../../app/jobs/sync_bpm_tasks_job'
+      require_relative '../../../app/jobs/sync_process_instances_job'
+      
       def self.included(base) # :nodoc
         base.send(:include, InstanceMethods)
 
@@ -51,7 +54,7 @@ module BpmIntegration
               end
           end
           SyncBpmTasksJob.perform_now()
-          # TODO: verificar se o processo terminou -> concluir a tarefa original
+          SyncProcessInstancesJob.perform_now()
         end
 
         private

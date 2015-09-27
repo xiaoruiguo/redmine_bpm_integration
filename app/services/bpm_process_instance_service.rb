@@ -8,6 +8,27 @@ class BpmProcessInstanceService < ActivitiBpmService
     BpmProcessInstance.new(hash_bpm_processes)
   end
 
+  def self.historic_process_instance(process_instance_id)
+    hash_bpm_process = get(
+      '/history/historic-process-instances/' + process_instance_id.to_s,
+      basic_auth: @@auth
+    )
+    BpmProcessInstance.new(hash_bpm_process)
+  end
+
+  def self.process_instance_list
+    process_list = get(
+      '/runtime/process-instances/',
+      basic_auth: @@auth
+    )["data"]
+
+    process_list.each do |p|
+      processes << BpmProcessInstance.new(p)
+    end
+
+    return processes
+  end
+
   def self.process_instance_image(process_instance_id)
     get(
       '/runtime/process-instances/' + process_instance_id + '/diagram',

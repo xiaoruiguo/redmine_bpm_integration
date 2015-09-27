@@ -22,7 +22,7 @@ class SyncBpmTasksJob < ActiveJob::Base
         issue.description = task.description
         issue.priority_id = IssuePriority.default.id
         issue.author_id = Setting.plugin_bpm_integration[:bpm_user].to_i
-
+        
         if task.assignee.is_a?(Integer) && !(user_assigned = Principal.where(id: task.assignee.to_i).first).blank?
           issue.assigned_to_id = user_assigned.id
         end

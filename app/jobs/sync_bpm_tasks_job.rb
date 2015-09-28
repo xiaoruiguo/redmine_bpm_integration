@@ -47,7 +47,7 @@ class SyncBpmTasksJob < ActiveJob::Base
         end
       rescue => exception
         logger.error exception
-        p "[SyncBpmTaskJob - FATAL]" + exception.to_s
+        p "[SyncBpmTaskJob - FATAL] " + exception.to_s
       end
     end
   end

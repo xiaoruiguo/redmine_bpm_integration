@@ -1,6 +1,7 @@
-= Redmine BPM Integration
+## Redmine BPM Integration
 
-[![Code Climate](https://codeclimate.com/github/thalestpires/redmine_bpm_integration/badges/gpa.svg)](https://codeclimate.com/github/thalestpires/redmine_bpm_integration)
+[![Stories in Ready](https://badge.waffle.io/thalestpires/redmine_bpm_integration.svg?label=ready&title=Ready)](http://waffle.io/thalestpires/redmine_bpm_integration)
+[![Code Climate](https://codeclimate.com/github/thalestpires/redmine_bpm_integration/badges/gpa.svg)](https://codeclimate.com/github/thalestpires/redmine_bpm_integration) [![Dependency Status](https://gemnasium.com/thalestpires/redmine_bpm_integration.svg)](https://gemnasium.com/thalestpires/redmine_bpm_integration)
 
 This is a plugin for integrating Redmine with Activiti BPM.
 

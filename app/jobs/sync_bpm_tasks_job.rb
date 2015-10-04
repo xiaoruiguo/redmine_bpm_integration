@@ -11,34 +11,14 @@ class SyncBpmTasksJob < ActiveJob::Base
     read_human_tasks.each do |task|
       begin
         next if BpmIntegration::HumanTaskIssue.where(human_task_id:task.id).first
-        issue = Issue.new
-        issue.human_task_issue = BpmIntegration::HumanTaskIssue.new
-        issue.human_task_issue.human_task_id = task.id
+        issue = build_issue_from_task(task)
+
         task_definition = BpmIntegration::TaskDefinition.by_task_instance(
                                                             task.taskDefinitionKey, task.processDefinitionId).first
-        issue.human_task_issue.task_definition = task_definition
-        issue.status_id = Setting.plugin_bpm_integration[:new_status].to_i
-        issue.subject = task.name
-        issue.description = task.description
-        issue.priority_id = IssuePriority.default.id
-        issue.author_id = Setting.plugin_bpm_integration[:bpm_user].to_i
 
-        if task.assignee.is_a?(Integer) && !(user_assigned = Principal.where(id: task.assignee.to_i).first).blank?
-          issue.assigned_to_id = user_assigned.id
-        end
-        parent_issue = get_process_parent_issue(task)
-        issue.parent_id = parent_issue.id
-        issue.project_id = Project.where(identifier: task.formKey).first || issue.parent.project_id
+        issue.human_task_issue = build_human_task_issue(task, task_definition)
 
-        issue.tracker_id = get_tracker(task.processDefinitionId)
-
-        form_fields_data = task_form_data(task.id)['formProperties']
-        custom_field_values = []
-        task_definition.form_fields.each do |ff|
-          ff_data = form_fields_data.select { |ffd| ffd["id"] == ff.field_id }.first
-          custom_field_values << { id: ff.custom_field.id, value: ff_data["value"] }
-        end
-        issue.custom_fields = custom_field_values
+        issue.custom_fields = custom_values_from_task_form_data(task, task_definition)
 
         if issue.save(validation: false)
           p "[SyncBpmTaskJob - INFO] Issue \##{issue.id} (" + issue.subject + ") salva com sucesso."
@@ -52,14 +32,7 @@ class SyncBpmTasksJob < ActiveJob::Base
     end
   end
 
-  def get_process_parent_issue(task)
-    result = Issue.by_process_instance(task.processInstanceId)
-    if result.empty?
-      p "[SyncBpmTaskJob - ERROR] Não foi possível criar a human_task " + task.id
-      return nil
-    end
-    result.first
-  end
+  private
 
   def read_human_tasks
     begin
@@ -70,17 +43,60 @@ class SyncBpmTasksJob < ActiveJob::Base
     end
   end
 
-  def task_form_data(taskId)
-    BpmTaskService.form_data(taskId)
+  def build_issue_from_task(task)
+    issue = Issue.new
+    issue.status_id = Setting.plugin_bpm_integration[:new_status].to_i
+    issue.subject = task.name
+    issue.description = task.description
+    issue.priority_id = IssuePriority.default.id
+    issue.author_id = Setting.plugin_bpm_integration[:bpm_user].to_i
+    issue.tracker_id = get_tracker_id(task.processDefinitionId)
+    issue.parent_id = get_process_parent_issue_id(task)
+    issue.assigned_to_id = get_assignee_id(task.assignee)
+    issue.project_id = Project.where(identifier: task.formKey).pluck(:id).first || issue.parent.project_id
+
+    issue
   end
 
-  def get_tracker(process_id)
+  def get_tracker_id(process_id)
     begin
       tracker_process = BpmIntegration::ProcessDefinition.where(process_identifier: process_id).first
       tracker_process.tracker_process_definition.tracker_id
     rescue
       return nil
     end
+  end
+
+  def get_process_parent_issue_id(task)
+    result = Issue.by_process_instance(task.processInstanceId).pluck(:id)
+    if result.empty?
+      p "[SyncBpmTaskJob - ERROR] Não foi possível criar a human_task " + task.id
+      return nil
+    end
+    result.first
+  end
+
+  def get_assignee_id(task_assignee)
+    task_assignee.is_a?(Integer) ? (Principal.where(id: task_assignee.to_i).pluck(:id).first) : nil
+  end
+
+  def build_human_task_issue(task, task_definition)
+    human_task_issue = BpmIntegration::HumanTaskIssue.new
+    human_task_issue.human_task_id = task.id
+    human_task_issue.task_definition = task_definition
+
+    human_task_issue
+  end
+
+  def custom_values_from_task_form_data(task, task_definition)
+    custom_field_values = []
+    form_fields_data = BpmTaskService.form_data(task.id)['formProperties']
+    task_definition.form_fields.each do |ff|
+      ff_data = form_fields_data.select { |ffd| ffd["id"] == ff.field_id }.first
+      custom_field_values << { id: ff.custom_field.id, value: (ff_data["value"] || '') }
+    end
+
+    custom_field_values
   end
 
 end

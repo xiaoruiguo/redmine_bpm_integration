@@ -11,6 +11,7 @@ class ActivitiBpmService
 
   def self.variables_from_hash(form)
     variables = []
+    return [] if form.blank?
     form.each { |k, v| variables << { name: k, value: v } }
     variables
   end

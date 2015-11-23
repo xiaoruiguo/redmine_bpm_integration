@@ -17,12 +17,14 @@ class BpmProcessDefinitionService < ActivitiBpmService
       query: { latest: true },
       basic_auth: @@auth
     )["data"]
-
     process_list.each do |p|
       processes << BpmProcessDefinition.new(p)
     end
-
     return processes
+  rescue => e
+    puts "Ocorreu um erro ao acessar a url " + base_uri
+    puts e
+    raise "Ocorreu um erro inesperado. Entre em contato com o suporte."
   end
 
   def self.process_image(process_id)

@@ -12,7 +12,6 @@ class SyncBpmTasksJob < ActiveJob::Base
       begin
         next if BpmIntegration::HumanTaskIssue.where(human_task_id:task.id).first
         issue = build_issue_from_task(task)
-
         task_definition = BpmIntegration::TaskDefinition.by_task_instance(
                                                             task.taskDefinitionKey, task.processDefinitionId).first
 
@@ -44,17 +43,17 @@ class SyncBpmTasksJob < ActiveJob::Base
   end
 
   def build_issue_from_task(task)
+    parent = Issue.find(get_process_parent_issue_id(task))
     issue = Issue.new
     issue.status_id = Setting.plugin_bpm_integration[:new_status].to_i
-    issue.subject = task.name
-    issue.description = task.description
+    issue.subject = (task.name + " - " + parent.subject).truncate(255)
+    issue.description = parent.description
     issue.priority_id = IssuePriority.default.id
     issue.author_id = Setting.plugin_bpm_integration[:bpm_user].to_i
     issue.tracker_id = get_tracker_id(task.processDefinitionId)
-    issue.parent_id = get_process_parent_issue_id(task)
+    issue.parent_id = parent.id
     issue.assigned_to_id = get_assignee_id(task.assignee)
     issue.project_id = Project.where(identifier: task.formKey).pluck(:id).first || issue.parent.project_id
-
     issue
   end
 

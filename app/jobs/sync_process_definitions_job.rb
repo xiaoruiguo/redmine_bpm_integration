@@ -13,13 +13,32 @@ class SyncProcessDefinitionsJob < ActiveJob::Base
 
       new_process = build_process_definition(process)
       new_process.form_fields = synchronize_form_fields(new_process)
+      preset_previous_version_configurations(new_process)
       new_process.task_definitions = synchronize_task_definitions(new_process)
-
       if new_process.save(validate:false)
         p '[StartProcessJob - INFO] Deploy de definição do processo ' + new_process.id.to_s + ' realizado com sucesso!'
       else
         p '[StartProcessJob - ERROR] Ocorreu um erro ao realizar deploy do processo ' + new_process.id.to_s
       end
+    end
+  end
+
+  def preset_previous_version_configurations(process)
+    last_version = BpmIntegration::ProcessDefinition.where(key:process.key).where.not(id:process.id).order('version desc').first
+    return if last_version.blank?
+    preset_form_field_definitions(process, last_version)
+    preset_process_tracker(process, last_version)
+  end
+
+  def preset_process_tracker(process, last_version)
+    process.tracker_process_definition = last_version.tracker_process_definition
+  end
+
+  def preset_form_field_definitions(process, last_version)
+    process.form_field_definitions.each do |field|
+      last_field = last_version.form_field_definitions.where(field_id:field.field_id).first
+      next if last_field.blank?
+      field.custom_field = last_field.custom_field
     end
   end
 

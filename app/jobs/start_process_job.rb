@@ -21,6 +21,7 @@ class StartProcessJob < ActiveJob::Base
         issue.reload
         issue.process_instance ||= BpmIntegration::IssueProcessInstance.new
         issue.process_instance.process_instance_id = response.id
+        issue.process_instance.process_definition = issue.tracker.process_definition
         issue.process_instance.completed = response.completed
         issue.process_instance.save!(validate:false)
         issue.status_id = response.completed ?

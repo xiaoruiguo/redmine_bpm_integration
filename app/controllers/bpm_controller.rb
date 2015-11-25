@@ -8,6 +8,7 @@ class BpmController < ApplicationController
   end
 
   def handle_error(msg_code, error = nil)
+    logger.error self.class
     logger.error response.code
     logger.error response.body
     logger.error error

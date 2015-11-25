@@ -90,7 +90,7 @@ class SyncBpmTasksJob < ActiveJob::Base
   def custom_values_from_task_form_data(task, task_definition)
     custom_field_values = []
     form_fields_data = BpmTaskService.form_data(task.id)['formProperties']
-    task_definition.form_fields.each do |ff|
+    task_definition.form_fields.select { |ff| ff.readable }.each do |ff|
       ff_data = form_fields_data.select { |ffd| ffd["id"] == ff.field_id }.first
       custom_field_values << { id: ff.custom_field.id, value: (ff_data["value"] || '') }
     end

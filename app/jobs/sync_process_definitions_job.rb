@@ -47,6 +47,8 @@ class SyncProcessDefinitionsJob < ActiveJob::Base
 
     form_fields = []
     form_properties.each do |form_item|
+      next unless form_item["readable"]
+
       field_definition = find_or_create_form_field_definition(process, form_item)
 
       form_field = build_form_field_from_hash(form_item)
@@ -71,6 +73,8 @@ class SyncProcessDefinitionsJob < ActiveJob::Base
 
       form_fields = []
       task_form_properties.each do |form_item|
+        next unless form_item["readable"]
+
         field_definition = find_or_create_form_field_definition(process, form_item)
 
         form_field = build_form_field_from_hash(form_item)

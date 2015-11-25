@@ -8,7 +8,7 @@ class ProcessInstancesController < BpmController
       return
     end
 
-    process_image = BpmProcessInstanceService.process_instance_image issue.process_instance.process_instance_id.to_s
+    process_image = BpmProcessInstanceService.process_instance_image issue.process_instance
     send_data process_image, :type => 'image/png', :disposition => 'inline'
   end
 

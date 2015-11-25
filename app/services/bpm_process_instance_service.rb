@@ -29,11 +29,21 @@ class BpmProcessInstanceService < ActivitiBpmService
     return processes
   end
 
-  def self.process_instance_image(process_instance_id)
-    get(
-      '/runtime/process-instances/' + process_instance_id + '/diagram',
-      basic_auth: @@auth
-    ).body
+  def self.process_instance_image(process_instance)
+    # binding.pry
+    id = process_instance.process_instance_id.to_s
+    if (process_instance.completed == true) 
+      get(
+        'http://localhost:8080/bpm/service/repository/deployments/2509/resourcedata/RackMultipart20151125-8296-bpqlug.myProcess.png',
+        basic_auth: @@auth
+      ).body
+    
+     else 
+      get(
+        '/runtime/process-instances/' + id + '/diagram',
+        basic_auth: @@auth
+      ).body
+    end     
   end
 
   def self.start_process(process_key, business_key, form)

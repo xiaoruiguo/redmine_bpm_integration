@@ -21,6 +21,9 @@ module BpmIntegration
 
           after_commit :start_process_instance, if: 'self.tracker.is_bpm_process? and !self.is_human_task?', on: :create
           before_save :close_human_task
+
+          alias_method_chain :available_custom_fields, :bpm_form_fields
+
         end
       end
 
@@ -28,6 +31,13 @@ module BpmIntegration
 
         def is_human_task?
           !self.human_task_issue.blank?
+        end
+
+        def available_custom_fields_with_bpm_form_fields
+          custom_fields = available_custom_fields_without_bpm_form_fields
+          custom_fields = custom_fields | human_task_issue.task_definition.form_fields.map(&:custom_field) if is_human_task?
+          custom_fields = custom_fields | tracker.process_definition.form_fields.map(&:custom_field) if tracker && tracker.is_bpm_process?
+          custom_fields
         end
 
         def start_process_instance

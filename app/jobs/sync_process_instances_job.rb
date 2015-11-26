@@ -15,12 +15,13 @@ class SyncProcessInstancesJob < ActiveJob::Base
       begin
         sync_process_instance(p)
       rescue => exception
-        handle_error(p.issue, exception)
+        handle_error(p.issue, exception.message, exception)
       end
     end
   rescue => exception
     Delayed::Worker.logger.error l('error_process_instance_job')
     Delayed::Worker.logger.error e.message
+    exception.backtrace.each { |line| Delayed::Worker.logger.error line }
   end
 
   after_perform do |job|
@@ -47,12 +48,15 @@ class SyncProcessInstancesJob < ActiveJob::Base
     end
     issue_process_instance.completed = true
     issue_process_instance.save
+    #TODO: Melhora log abaixo
     Delayed::Worker.logger.info "#{self.class} - Issue concluída mediante o fim do processo"
   end
 
-  def handle_error(issue, exception)
-    Delayed::Worker.logger.error exception.message
+  def handle_error(issue, msg, e = nil)
+    Delayed::Worker.logger.error l('error_process_instance_job')
+    Delayed::Worker.logger.error msg
+    e.backtrace.each { |line| Delayed::Worker.logger.error line }
     user = User.find(Setting.plugin_bpm_integration[:bpm_user])
-    Journal.new(:journalized => issue, :user => user, :notes => l('error_process_instance_job') + ":  #{exception.to_s}", :private_notes => true).save
+    Journal.new(:journalized => issue, :user => user, :notes => l('error_process_instance_job') + ":  #{msg}", :private_notes => true).save
   end
 end

@@ -30,7 +30,7 @@ class StartProcessJob < ActiveJob::Base
 
         issue.save!(validate:false)
 
-        Delayed::Worker.logger.info self.class.to_s + " - Issue \##{issue.id} - Processo " + issue.process_instance.process_instance_id + " iniciado com sucesso!"
+        Delayed::Worker.logger.info "#{self.class} - Issue \##{issue.id} - Processo " + issue.process_instance.process_instance_id.to_s + " iniciado com sucesso!"
 
         #JOB - Atualiza tarefas de um processo
         SyncBpmTasksJob.perform_now(issue.process_instance.process_instance_id)
@@ -38,7 +38,7 @@ class StartProcessJob < ActiveJob::Base
         handle_error(issue, "Response nula")
       end
     rescue => exception
-      handle_error(issue, exception.message)
+      handle_error(issue, exception.message, exception)
     end
   end
 
@@ -58,9 +58,10 @@ class StartProcessJob < ActiveJob::Base
     hash_fields.reduce(&:merge)
   end
 
-  def handle_error(issue, msg)
+  def handle_error(issue, msg, e = nil)
     Delayed::Worker.logger.error l('error_process_start')
     Delayed::Worker.logger.error msg
+    e.backtrace.each { |line| Delayed::Worker.logger.error line }
     user = User.find(Setting.plugin_bpm_integration[:bpm_user])
     Journal.new(:journalized => issue, :user => user, :notes => l('error_process_start') + ":  #{msg}", :private_notes => true).save
   end

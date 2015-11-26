@@ -30,11 +30,13 @@ class SyncBpmTasksJob < ActiveJob::Base
         end
       rescue => exception
         Delayed::Worker.logger.error exception.message
+        exception.backtrace.each { |line| Delayed::Worker.logger.error line }
       end
     end
   rescue => e
     Delayed::Worker.logger.error l('error_bpm_tasks_job')
     Delayed::Worker.logger.error e.message
+    e.backtrace.each { |line| Delayed::Worker.logger.error line }
   end
 
   after_perform do |job|

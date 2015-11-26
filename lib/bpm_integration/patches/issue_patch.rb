@@ -54,8 +54,9 @@ module BpmIntegration
                 end
               end
           end
+
           #JOB - Atualiza tarefas de um processo
-          SyncBpmTasksJob.perform_now(issue.process_instance.process_instance_id)
+          SyncBpmTasksJob.perform_now(self.parent.process_instance.id)
 
           #JOB - Atualiza process_instances
           SyncProcessInstancesJob.perform_now()

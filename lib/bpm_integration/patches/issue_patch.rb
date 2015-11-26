@@ -41,7 +41,7 @@ module BpmIntegration
           if Issue.find(self.id).status_id != Setting.plugin_bpm_integration[:closed_status].to_i
               task_id = self.human_task_issue.human_task_id
               if !task_id.blank?
-                form_fields = self.human_task_issue.form_fields
+                form_fields = self.human_task_issue.task_definition.form_fields
                 form_data = form_values(form_fields)
                 response = BpmTaskService.resolve_task(task_id, form_data)
                 if response != nil && response.code == 200

@@ -29,13 +29,16 @@ class StartProcessJob < ActiveJob::Base
                             Setting.plugin_bpm_integration[:doing_status].to_i
 
         issue.save!(validate:false)
-        p "[StartProcessJob - INFO] Issue \##{issue.id} -  Processo Iniciado com sucesso"
-        SyncBpmTasksJob.perform_now
+
+        Delayed::Worker.logger.info self.class.to_s + " - Issue \##{issue.id} - Processo " + issue.process_instance.process_instance_id + " iniciado com sucesso!"
+
+        #JOB - Atualiza tarefas de um processo
+        SyncBpmTasksJob.perform_now(issue.process_instance.process_instance_id)
       else
-        handle_error(issue, l('msg_process_start_error'))
+        handle_error(issue, "Response nula")
       end
     rescue => exception
-      handle_error(issue, exception)
+      handle_error(issue, exception.message)
     end
   end
 
@@ -55,13 +58,11 @@ class StartProcessJob < ActiveJob::Base
     hash_fields.reduce(&:merge)
   end
 
-  def handle_error(issue, exception)
-    logger.error exception
+  def handle_error(issue, msg)
+    Delayed::Worker.logger.error l('error_process_start')
+    Delayed::Worker.logger.error msg
     user = User.find(Setting.plugin_bpm_integration[:bpm_user])
-    issue.status_id = Setting.plugin_bpm_integration[:error_status].to_i
-    issue.save(validate:false)
-    Journal.new(:journalized => issue, :user => user, :notes => l('msg_process_start_error')).save
-    Journal.new(:journalized => issue, :user => user, :notes => "[StartProcessJob - FATAL] #{exception.to_s}", :private_notes => true).save
+    Journal.new(:journalized => issue, :user => user, :notes => l('error_process_start') + ":  #{msg}", :private_notes => true).save
   end
 
 end

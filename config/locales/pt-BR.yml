@@ -19,7 +19,6 @@ pt-BR:
   start_process: 'Iniciar'
   view_process_instance: 'Visualizar andamento do processo'
   msg_process_started: 'O processo foi iniciado com sucesso!'
-  msg_process_start_error: 'Ocorreu um erro ao iniciar um novo processo.'
   msg_process_uploaded: 'A definição de processo foi carregada com sucesso!'
   msg_process_upload_error: 'Ocorreu um erro ao carregar a definição de processo.'
   title_process_definition_tracker: 'Tipo de Tarefa que representa o processo'
@@ -27,4 +26,8 @@ pt-BR:
 
   #Tasks
   bpm_tasks: 'Tarefas BPM'
-  error_bpm_tasks: 'Ocorreu um erro ao tentar recuperar a lista de tarefas.'
+
+  #Erros
+  error_process_instance_job: 'Ocorreu um erro ao tentar sincronizar com o processo do BPMs'
+  error_process_start: 'Ocorreu um erro ao iniciar um novo processo.'
+  error_bpm_tasks_job: 'Ocorreu um erro ao tentar sincronizar a lista de tarefas com o BPMs.'

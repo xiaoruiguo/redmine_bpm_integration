@@ -6,6 +6,7 @@ class ProcessDefinitionsController < BpmController
   before_filter :require_admin
 
   def index
+    #JOB - Atualiza process_definitions
     SyncProcessDefinitionsJob.perform_now
     @process_definitions = BpmIntegration::ProcessDefinition.latest
   end
@@ -40,6 +41,7 @@ class ProcessDefinitionsController < BpmController
       process_data = params[:bpm_process_definition][:upload].tempfile
       response = BpmProcessDefinitionService.deploy_process(process_data)
       if !response.blank? && response.code == 201
+        #JOB - Atualiza process_definitions (specific)
         SyncProcessDefinitionsJob.perform_now
         handle_sucess('msg_process_uploaded')
       else

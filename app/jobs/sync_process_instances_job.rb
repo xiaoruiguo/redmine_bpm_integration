@@ -1,5 +1,5 @@
 class SyncProcessInstancesJob < ActiveJob::Base
-  queue_as :default
+  queue_as :bpm_process_instances
 
   include Redmine::I18n
 
@@ -10,16 +10,29 @@ class SyncProcessInstancesJob < ActiveJob::Base
   protected
 
   def sync_process_instance_list
+    Delayed::Worker.logger.info "#{self.class} - Sincronizando process_instances"
     BpmIntegration::IssueProcessInstance.where(completed:false).each do |p|
       begin
         sync_process_instance(p)
       rescue => exception
-        handle_error exception
+        handle_error(p.issue, exception)
       end
+    end
+  rescue => exception
+    Delayed::Worker.logger.error l('error_process_instance_job')
+    Delayed::Worker.logger.error e.message
+  end
+
+  after_perform do |job|
+    if job.arguments.empty?
+      #JOB - Reagendamento
+      self.class.set(wait: SyncJobsPeriod.process_instance_period).perform_later
+      Delayed::Worker.logger.info "#{self.class} - Sincronização de instancias de processos agendada"
     end
   end
 
   def sync_process_instance(issue_process_instance)
+    #TODO: Tratar erros no Activiti e atualizar para status Erro
     historic_process = BpmProcessInstanceService.historic_process_instance(issue_process_instance.process_instance_id)
     resolve_issue_process(issue_process_instance,historic_process) unless historic_process.blank? || historic_process.endTime.blank?
   end
@@ -34,11 +47,12 @@ class SyncProcessInstancesJob < ActiveJob::Base
     end
     issue_process_instance.completed = true
     issue_process_instance.save
-    p "[INFO] Issue concluída mediante o fim do processo"
+    Delayed::Worker.logger.info "#{self.class} - Issue concluída mediante o fim do processo"
   end
 
-  def handle_error(exception)
-    logger.error exception
-    p "[ERROR]" + exception.to_s
+  def handle_error(issue, exception)
+    Delayed::Worker.logger.error exception.message
+    user = User.find(Setting.plugin_bpm_integration[:bpm_user])
+    Journal.new(:journalized => issue, :user => user, :notes => l('error_process_instance_job') + ":  #{exception.to_s}", :private_notes => true).save
   end
 end

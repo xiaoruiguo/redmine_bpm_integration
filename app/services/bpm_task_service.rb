@@ -2,10 +2,14 @@ class BpmTaskService < ActivitiBpmService
 
   require_relative '../models/bpm_task'
 
-  def self.task_list
-    hash_bpm_taks = get('/runtime/tasks', basic_auth: @@auth)
+  def self.task_list(process_instance_id = nil)
+    if process_instance_id
+      hash_bpm_tasks = get("/runtime/tasks?processInstanceId=#{process_instance_id}", basic_auth: @@auth)
+    else
+      hash_bpm_tasks = get("/runtime/tasks", basic_auth: @@auth)
+    end
     tasks = []
-    hash_bpm_taks["data"].each do |t|
+    hash_bpm_tasks["data"].each do |t|
       tasks << BpmTask.new(t)
     end
     return tasks

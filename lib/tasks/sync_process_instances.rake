@@ -5,7 +5,7 @@ namespace :redmine do
     namespace :bpm_integration do
       task sync_process_instances: :environment do
           require_relative '../../app/jobs/sync_process_instances_job'
-          SyncProcessInstancesJob.perform_now()
+          SyncProcessInstancesJob.perform_now
       end
     end
   end

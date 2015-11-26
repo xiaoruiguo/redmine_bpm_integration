@@ -1,14 +1,17 @@
 class SyncBpmTasksJob < ActiveJob::Base
-  queue_as :default
+  queue_as :bpm_tasks
 
-  def perform
-    synchronize_tasks
+  include Redmine::I18n
+
+  def perform(process_instance_id = nil)
+    synchronize_tasks(process_instance_id)
   end
 
   protected
 
-  def synchronize_tasks
-    read_human_tasks.each do |task|
+  def synchronize_tasks(process_instance_id)
+    Delayed::Worker.logger.info "#{self.class} - Sincronizando bpm_tasks para criar issues"
+    read_human_tasks(process_instance_id).each do |task|
       begin
         next if BpmIntegration::HumanTaskIssue.where(human_task_id:task.id).first
         issue = build_issue_from_task(task)
@@ -20,24 +23,35 @@ class SyncBpmTasksJob < ActiveJob::Base
         issue.custom_fields = custom_values_from_task_form_data(task, task_definition)
 
         if issue.save(validation: false)
-          p "[SyncBpmTaskJob - INFO] Issue \##{issue.id} (" + issue.subject + ") salva com sucesso."
+          Delayed::Worker.logger.info "#{self.class} - Issue \##{issue.id} (" + issue.subject + ") criada baseada na human_task " + task.id
         else
-          p "[SyncBpmTaskJob - ERROR] " + issue.errors.messages
+          Delayed::Worker.logger.error "Ocorreram erros ao tentar salvar a issue " + issue.subject + "baseada na human_task " + task.id + ":"
+          Delayed::Worker.logger.error issue.errors.messages.to_s
         end
       rescue => exception
-        logger.error exception
-        p "[SyncBpmTaskJob - FATAL] " + exception.to_s
+        Delayed::Worker.logger.error exception.message
       end
+    end
+  rescue => e
+    Delayed::Worker.logger.error l('error_bpm_tasks_job')
+    Delayed::Worker.logger.error e.message
+  end
+
+  after_perform do |job|
+    if job.arguments.empty?
+      #JOB - Reagendamento
+      self.class.set(wait: SyncJobsPeriod.bpm_task_period).perform_later
+      Delayed::Worker.logger.info "#{self.class} - Sincronização de tarefas agendada"
     end
   end
 
   private
 
-  def read_human_tasks
+  def read_human_tasks(process_instance_id)
     begin
-      BpmTaskService.task_list
+      BpmTaskService.task_list(process_instance_id)
     rescue => e
-      logger.error e.to_s
+      Delayed::Worker.logger.error e.to_s
       []
     end
   end
@@ -69,7 +83,7 @@ class SyncBpmTasksJob < ActiveJob::Base
   def get_process_parent_issue_id(task)
     result = Issue.by_process_instance(task.processInstanceId).pluck(:id)
     if result.empty?
-      p "[SyncBpmTaskJob - ERROR] Não foi possível criar a human_task " + task.id
+      Rails.logger.error "Não foi possível criar a human_task " + task.id
       return nil
     end
     result.first

@@ -32,6 +32,7 @@ module BpmIntegration
 
         def start_process_instance
           require_relative('../../../app/jobs/start_process_job')
+          #JOB - Inicia processo
           StartProcessJob.perform_now(self.id)
         end
 
@@ -53,7 +54,10 @@ module BpmIntegration
                 end
               end
           end
-          SyncBpmTasksJob.perform_now()
+          #JOB - Atualiza tarefas de um processo
+          SyncBpmTasksJob.perform_now(issue.process_instance.process_instance_id)
+
+          #JOB - Atualiza process_instances
           SyncProcessInstancesJob.perform_now()
         end
 

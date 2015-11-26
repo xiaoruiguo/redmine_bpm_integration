@@ -19,7 +19,6 @@ en:
   start_process: 'Start'
   view_process_instance: 'View process progress'
   msg_process_started: 'The process was successfully started!'
-  msg_process_start_error: 'An error ocurred while trying to start a new process.'
   msg_process_uploaded: 'The process definition was successfully uploaded!'
   msg_process_upload_error: 'An error ocurred while trying to upload a new process definition.'
   title_process_definition_tracker: 'Tracker that represents the process'
@@ -27,4 +26,8 @@ en:
 
   #Tasks
   bpm_tasks: 'BPM Tasks'
-  error_bpm_tasks: 'An error ocurred while trying to recover the list of tasks.'
+
+  #Error
+  error_process_start: 'An error ocurred while trying to start a new process.'
+  error_process_instance_job: 'An error ocurred while trying to sync process information from the BPMs engine'
+  error_bpm_tasks_job: 'An error ocurred while trying to sync Tasks from BPMs.'

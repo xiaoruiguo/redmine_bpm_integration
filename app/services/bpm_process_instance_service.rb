@@ -34,7 +34,7 @@ class BpmProcessInstanceService < ActivitiBpmService
     id = process_instance.process_instance_id.to_s
     if (process_instance.completed == true) 
       get(
-        'http://localhost:8080/bpm/service/repository/deployments/2509/resourcedata/RackMultipart20151125-8296-bpqlug.myProcess.png',
+        '/repository/process-definitions/' + process_instance.process_definition.process_identifier + '/image',
         basic_auth: @@auth
       ).body
     

@@ -30,20 +30,19 @@ class BpmProcessInstanceService < ActivitiBpmService
   end
 
   def self.process_instance_image(process_instance)
-    # binding.pry
     id = process_instance.process_instance_id.to_s
-    if (process_instance.completed == true) 
+    if (process_instance.completed == true)
       get(
         '/repository/process-definitions/' + process_instance.process_definition.process_identifier + '/image',
         basic_auth: @@auth
       ).body
-    
-     else 
+
+     else
       get(
         '/runtime/process-instances/' + id + '/diagram',
         basic_auth: @@auth
       ).body
-    end     
+    end
   end
 
   def self.start_process(process_key, business_key, form)

@@ -11,7 +11,10 @@ class BpmController < ApplicationController
     logger.error self.class
     logger.error response.code
     logger.error response.body
-    logger.error error
+    if error
+      logger.error error.msg
+      error.backtrace.each { |line| logger.error line }
+    end
     redirect_to :back, flash: {error: l(msg_code)}
   end
 

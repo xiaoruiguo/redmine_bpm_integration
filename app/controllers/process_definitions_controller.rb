@@ -42,7 +42,7 @@ class ProcessDefinitionsController < BpmController
       response = BpmProcessDefinitionService.deploy_process(process_data)
       if !response.blank? && response.code == 201
         #JOB - Atualiza process_definitions (specific)
-        SyncProcessDefinitionsJob.perform_now
+        SyncProcessDefinitionsJob.perform_now(response["id"])
         handle_sucess('msg_process_uploaded')
       else
         handle_error('msg_process_upload_error')

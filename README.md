@@ -12,6 +12,7 @@ The Active Record backend requires a jobs table. You can create that table by ru
   rails generate delayed_job:active_record
   rake db:migrate
 
+DELAYED JOB
   Installation of the delayed_job gem (using active record):
     - Run the commands below:
     RAILS_ENV=production bundle exec rails generate delayed_job:active_record
@@ -31,7 +32,7 @@ The Active Record backend requires a jobs table. You can create that table by ru
       Delayed::Worker.raise_signal_exceptions = :term
       Delayed::Worker.logger = Logger.new(File.join(Rails.root, 'log', 'delayed_job.log'))
       Delayed::Worker.logger.datetime_format = '%Y-%m-%d %H:%M:%S'
-      
+
     - Give write permission to the log file
       >chmod a+w {RAILS_ROOT_PATH}/log/delayed_job.log
 
@@ -47,3 +48,23 @@ The Active Record backend requires a jobs table. You can create that table by ru
 
     - In development an error occurs when delayed job runs a job scheduled by itself. To prevent this error add the following line to {RAILS_ROOT_PATH}/config/environments/{Rails.env}.rb :
       >config.cache_classes = true
+
+Synchronization Jobs
+
+  Description of when sync jobs are triggered:
+
+  Start process (start_process_job)
+    - On create issue
+
+  Process definitions (sync_process_definitions_job)
+    - On deploy (specific)
+    - On render process list
+
+  Human Tasks (sync_bpm_tasks_job)
+    - In start process job (specific)
+    - On closing issue (specific)
+
+  Process Instances (sync_process_instances_job)
+    - On closing issue (specific)
+
+  To identify where they are being called, search for "#JOB"

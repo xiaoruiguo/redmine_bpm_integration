@@ -1,26 +1,49 @@
 class SyncProcessDefinitionsJob < ActiveJob::Base
   queue_as :default
 
-  def perform
-    synchronize
+  def perform(process_definition_id = nil)
+    if process_definition_id.blank?
+      synchronize_process_list
+    else
+      synchronize_single_process(process_definition_id)
+    end
   end
 
   protected
 
-  def synchronize
+  def synchronize_process_list
+    Delayed::Worker.logger.info "#{self.class} - Sincronizando process_definitions"
     BpmProcessDefinitionService.process_list.each do |process|
       next if BpmIntegration::ProcessDefinition.where(process_identifier:process.id).first
-
-      new_process = build_process_definition(process)
-      new_process.form_fields = synchronize_form_fields(new_process)
-      preset_previous_version_configurations(new_process)
-      new_process.task_definitions = synchronize_task_definitions(new_process)
-      if new_process.save(validate:false)
-        p '[StartProcessJob - INFO] Deploy de definição do processo ' + new_process.id.to_s + ' realizado com sucesso!'
-      else
-        p '[StartProcessJob - ERROR] Ocorreu um erro ao realizar deploy do processo ' + new_process.id.to_s
+      begin
+        Delayed::Worker.logger.info "#{self.class} - Sincronizando process_definition " + process.id.to_s
+        save_process_definition(process)
+      rescue => e
+        Delayed::Worker.logger.error "#{self.class} - Ocorreu um erro ao realizar cadastro do processo " + process.id.to_s
+        e.backtrace.each { |line| Delayed::Worker.logger.error line }
       end
     end
+  rescue => e
+    Delayed::Worker.logger.error "#{self.class} - Ocorreu um erro na sincronização."
+    e.backtrace.each { |line| Delayed::Worker.logger.error line }
+  end
+
+  def synchronize_single_process(process_definition_id)
+    Delayed::Worker.logger.info "#{self.class} - Sincronizando apenas process_definition " + process.id.to_s
+    process = BpmProcessDefinitionService.process_definition(process_definition_id)
+    save_process_definition(process)
+  rescue => e
+    Delayed::Worker.logger.error "#{self.class} - Ocorreu um erro ao realizar cadastro do processo " + process_definition_id.to_s
+    e.backtrace.each { |line| Delayed::Worker.logger.error line }
+  end
+
+  def save_process_definition(process)
+    new_process = build_process_definition(process)
+    new_process.form_fields = synchronize_form_fields(new_process)
+    preset_previous_version_configurations(new_process)
+    new_process.task_definitions = synchronize_task_definitions(new_process)
+    new_process.save!(validate:false)
+    Delayed::Worker.logger.info "#{self.class} - Cadastro de definição do processo " + process.id.to_s + " realizado com sucesso!"
   end
 
   def preset_previous_version_configurations(process)

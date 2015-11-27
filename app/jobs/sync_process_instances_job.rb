@@ -3,8 +3,12 @@ class SyncProcessInstancesJob < ActiveJob::Base
 
   include Redmine::I18n
 
-  def perform
-    sync_process_instance_list
+  def perform(issue_process_instance = nil)
+    if issue_process_instance.nil?
+      sync_process_instance_list
+    else
+      sync_process_instance(issue_process_instance)
+    end
   end
 
   protected
@@ -18,6 +22,7 @@ class SyncProcessInstancesJob < ActiveJob::Base
         handle_error(p.issue, exception.message, exception)
       end
     end
+    Delayed::Worker.logger.info "#{self.class} - Sincronização de process_instances concluída"
   rescue => exception
     Delayed::Worker.logger.error l('error_process_instance_job')
     Delayed::Worker.logger.error e.message
@@ -49,7 +54,7 @@ class SyncProcessInstancesJob < ActiveJob::Base
     issue_process_instance.completed = true
     issue_process_instance.save
     #TODO: Melhora log abaixo
-    Delayed::Worker.logger.info "#{self.class} - Issue concluída mediante o fim do processo"
+    Delayed::Worker.logger.info "#{self.class} - Issue \##{issue.id.to_s} concluída mediante o fim do processo"
   end
 
   def handle_error(issue, msg, e = nil)

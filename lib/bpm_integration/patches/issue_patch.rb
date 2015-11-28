@@ -23,6 +23,7 @@ module BpmIntegration
           before_save :close_human_task
 
           alias_method_chain :available_custom_fields, :bpm_form_fields
+          alias_method_chain :read_only_attribute_names, :bpm_form_fields
 
         end
       end
@@ -38,7 +39,18 @@ module BpmIntegration
           custom_fields = custom_fields | human_task_issue.task_definition.form_fields
                 .select{ |ff| ff.readable }.map(&:custom_field) if is_human_task?
           custom_fields = custom_fields | tracker.process_definition.form_fields
-                .select{ |ff| ff.readable }.map(&:custom_field) if tracker && tracker.is_bpm_process? && !is_human_task?
+                .select{ |ff| ff.readable }
+                .map(&:custom_field) if !is_human_task? && tracker && tracker.is_bpm_process?
+          custom_fields
+        end
+
+        def read_only_attribute_names_with_bpm_form_fields(user = nil)
+          custom_fields = read_only_attribute_names_without_bpm_form_fields(user)
+          custom_fields = custom_fields | human_task_issue.task_definition.form_fields
+                .select{ |ff| !ff.writable }.map{ |ff| ff.custom_field.id.to_s } if is_human_task?
+          custom_fields = custom_fields | tracker.process_definition.form_fields
+                .select{ |ff| !ff.writable }
+                .map{ |ff| ff.custom_field.id.to_s } if !is_human_task? && tracker && tracker.is_bpm_process?
           custom_fields
         end
 

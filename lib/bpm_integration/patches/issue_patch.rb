@@ -35,8 +35,10 @@ module BpmIntegration
 
         def available_custom_fields_with_bpm_form_fields
           custom_fields = available_custom_fields_without_bpm_form_fields
-          custom_fields = custom_fields | human_task_issue.task_definition.form_fields.map(&:custom_field) if is_human_task?
-          custom_fields = custom_fields | tracker.process_definition.form_fields.map(&:custom_field) if tracker && tracker.is_bpm_process?
+          custom_fields = custom_fields | human_task_issue.task_definition.form_fields
+                .select{ |ff| ff.readable }.map(&:custom_field) if is_human_task?
+          custom_fields = custom_fields | tracker.process_definition.form_fields
+                .select{ |ff| ff.readable }.map(&:custom_field) if tracker && tracker.is_bpm_process? && !is_human_task?
           custom_fields
         end
 

@@ -23,7 +23,7 @@ class SyncBpmTasksJob < ActiveJob::Base
 
         issue.custom_fields = custom_values_from_task_form_data(task, task_definition)
 
-        if issue.save(validation: false)
+        if issue.save(validate: false)
           Delayed::Worker.logger.info "#{self.class} - Issue \##{issue.id} (" + issue.subject + ") criada baseada na human_task " + task.id
         else
           Delayed::Worker.logger.error "Ocorreram erros ao tentar salvar a issue " + issue.subject + "baseada na human_task " + task.id + ":"

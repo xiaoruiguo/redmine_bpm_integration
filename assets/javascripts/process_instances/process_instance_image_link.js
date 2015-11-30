@@ -1,6 +1,6 @@
 $(function() {
-    $('.popup-bpm-diagram').click(function() {
-    	$('#teste-dialog2').dialog({
+    $('.popup_bpm_diagram').click(function() {
+    	$('#diagram_loader').dialog({
     		autoOpen: false,
 		    minWidth: 700,
 		    width: 'auto',
@@ -8,6 +8,6 @@ $(function() {
 		    maxHeight: 600,
 		    modal: true
     		});
-    	$('#teste-dialog2').dialog('open');
+    	$('#diagram_loader').dialog('open');
     });
 });

@@ -1,3 +1,7 @@
 #teste-dialog2 {
 	display: none;
+	/*quando padronizarmos a forma de fazer o diagrama do bpm, ajustar esses valores*/
+	margin-right: 30px;
+    margin-bottom: 100px;
 }
+

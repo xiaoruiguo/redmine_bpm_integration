@@ -54,8 +54,14 @@ class ProcessDefinitionsController < BpmController
 
   def show
     @process_definition = BpmIntegration::ProcessDefinition.find(params[:id])
-    process_image = BpmProcessDefinitionService.process_image @process_definition.process_identifier
-    send_data process_image, :type => 'image/png',:disposition => 'inline'
+
+    respond_to do |format|
+      format.png do
+        process_image = BpmProcessDefinitionService.process_image @process_definition.process_identifier
+        send_data process_image, :type => 'image/png',:disposition => 'inline'
+      end
+    end
+        
   end
 
 end

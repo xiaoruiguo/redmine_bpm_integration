@@ -1,19 +1,33 @@
-  label,  input {
-    display: block;
-    float: left;
-  }
+label,  input {
+  display: block;
+  float: left;
+}
 
-  label {
-    text-align: right;
-    width: 50px;
-    padding-right: 20px;
-    padding-bottom: 10px;
-  }
+label {
+  text-align: right;
+  width: 50px;
+  padding-right: 20px;
+  padding-bottom: 10px;
+}
 
-  fieldset {
-    border: solid 1px #000;
-  }
+fieldset {
+  border: solid 1px #000;
+}
 
-  br {
-    clear: left;
-  }
+br {
+  clear: left;
+}
+
+#diagram_loader {
+  display: none;
+  /*quando padronizarmos a forma de fazer o diagrama do bpm, ajustar esses valores*/
+  margin-right: 30px;
+  margin-bottom: 100px;
+}
+
+.diagram_loader {
+  display: none;
+  /*quando padronizarmos a forma de fazer o diagrama do bpm, ajustar esses valores*/
+  margin-right: 30px;
+  margin-bottom: 100px;
+}

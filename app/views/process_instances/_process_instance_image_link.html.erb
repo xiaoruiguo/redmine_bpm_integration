@@ -4,7 +4,7 @@
 <%= button_tag(l(:view_process_instance), :class => "popup-bpm-diagram") if issue.process_instance %>
 <div id="teste-dialog2">
 	<h2>	
-		<%= issue.process_instance.completed ? "Processo Completo" : "Status do Processo" %> 
+		<%= issue.process_instance.completed ? l(:process_finished_image) : l(:process_in_progress_image) %> 
 
 	</h2>
 	<%= image_tag(process_instance_path(issue.id, format: "png"), :class => 'diagram-bpm') %>

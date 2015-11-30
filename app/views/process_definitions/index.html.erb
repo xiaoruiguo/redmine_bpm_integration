@@ -1,37 +1,5 @@
-<style type="text/css">
-  label,  input {
-    display: block;
-    float: left;
-  }
-
-  label {
-    text-align: right;
-    width: 50px;
-    padding-right: 20px;
-    padding-bottom: 10px;
-  }
-
-  fieldset {
-    border: solid 1px #000;
-  }
-
-  br {
-    clear: left;
-  }
-</style>
-
-<script type="text/javascript">
-function performUploadClick(node)
-{
-   document.getElementById('bpm_process_definition_upload').onchange = function() {
-     document.upload_form.submit();
-   };
-
-   var evt = document.createEvent("MouseEvents");
-   evt.initEvent("click", true, false);
-   node.dispatchEvent(evt);
-}
-</script>
+ <%= stylesheet_link_tag "process_definitions/index", plugin: "bpm_integration" %>
+ <%= javascript_include_tag "process_definitions/index", plugin: "bpm_integration" %>
 
 <div class="contextual">
   <%= form_tag process_definitions_path, name: "upload_form", multipart: true do %>

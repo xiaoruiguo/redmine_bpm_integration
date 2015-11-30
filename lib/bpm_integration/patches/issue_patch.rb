@@ -20,7 +20,7 @@ module BpmIntegration
                                           }
 
           after_commit :start_process_instance, if: 'self.tracker.is_bpm_process? and !self.is_human_task?', on: :create
-          before_save :close_human_task
+          before_save :close_human_task, if: 'self.status.is_closed and self.is_human_task?'
 
           alias_method_chain :available_custom_fields, :bpm_form_fields
           alias_method_chain :read_only_attribute_names, :bpm_form_fields
@@ -72,29 +72,29 @@ module BpmIntegration
         end
 
         def close_human_task
-          return unless self.is_human_task? && self.status_id == Setting.plugin_bpm_integration[:closed_status].to_i
-          if Issue.find(self.id).status_id != Setting.plugin_bpm_integration[:closed_status].to_i
-              task_id = self.human_task_issue.human_task_id
-              if !task_id.blank?
-                form_fields = self.human_task_issue.task_definition.form_fields
-                form_data = form_values(form_fields)
-                response = BpmTaskService.resolve_task(task_id, form_data)
-                if response != nil && response.code == 200
-                  puts "Tarefa completada no BPMS"
-                else
-                  puts "Ocorreu um problema ao completar tarefa no BPMS. " + response.response.code + " - " + response.response.msg
-                  begin
-                    puts response["exception"] if response.is_a? Hash
-                  rescue;end
-                end
-              end
+          return if Issue.find(self.id).status.is_closed
+
+          task_id = self.human_task_issue.human_task_id
+          if !task_id.blank?
+            form_fields = self.human_task_issue.task_definition.form_fields
+            form_data = form_values(form_fields)
+            response = BpmTaskService.resolve_task(task_id, form_data)
+            if response != nil && response.code == 200
+              logger.info "#{self.class} - Tarefa completada no BPMS"
+
+              #JOB - Atualiza tarefas de um processo
+              SyncBpmTasksJob.perform_now(self.parent.process_instance.process_instance_id)
+
+              #JOB - Atualiza process_instances
+              SyncProcessInstancesJob.perform_now(self.parent.process_instance)
+
+            else
+              logger.error "#{self.class} - Ocorreu um problema ao completar tarefa no BPMS. " + response.response.code + " - " + response.response.msg
+              begin
+                logger.error response["exception"] if response.is_a? Hash
+              rescue;end
+            end
           end
-
-          #JOB - Atualiza tarefas de um processo
-          SyncBpmTasksJob.perform_now(self.parent.process_instance.process_instance_id)
-
-          #JOB - Atualiza process_instances
-          SyncProcessInstancesJob.perform_now(self.parent.process_instance)
         end
 
         private

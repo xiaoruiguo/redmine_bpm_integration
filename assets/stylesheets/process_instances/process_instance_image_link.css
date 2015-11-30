@@ -21,3 +21,14 @@ button.popup-bpm-diagram:focus {
 button.popup-bpm-diagram:hover {
     color: #ECB11F;
 }
+
+h2.titulo_diagrama_processo{
+    font-size: 20px;
+    color: #2E7E7D;
+    text-align: center;
+    width: 100%;
+}
+
+.ui-button-icon-only .ui-button-text {
+     padding: 0px; 
+}

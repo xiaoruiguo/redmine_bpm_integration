@@ -1,24 +1,6 @@
-<script type="text/javascript">
-	$(function() {
-    $('.popup-bpm-diagram').click(function() {
-    	$('#teste-dialog2').dialog({
-    		autoOpen: false,
-		    minWidth: 700,
-		    width: 'auto',
-		    height: 'auto',
-		    maxHeight: 600,
-		    modal: true
-    		});
-    	$('#teste-dialog2').dialog('open');
-    	});
-    });
-</script>
+ <%= stylesheet_link_tag "process_instances/process_instance_image_link", plugin: "bpm_integration" %>
+ <%= javascript_include_tag "process_instances/process_instance_image_link", plugin: "bpm_integration" %>
 
-<style>
-#teste-dialog2 {
-	display: none;
-}
-</style>
 <%= button_tag(l(:view_process_instance), :class => "popup-bpm-diagram") if @issue.process_instance %>
 <div id="teste-dialog2">
 	<%= image_tag(process_instance_path(@issue.id), :class => 'diagram-bpm') %>

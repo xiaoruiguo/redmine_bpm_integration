@@ -31,3 +31,7 @@ en:
   error_process_start: 'An error ocurred while trying to start a new process.'
   error_process_instance_job: 'An error ocurred while trying to sync process information from the BPMs engine'
   error_bpm_tasks_job: 'An error ocurred while trying to sync Tasks from BPMs.'
+
+  #Diagram Image
+  process_finished_image: 'Completed Process'
+  process_in_progress_image: 'Process Status'

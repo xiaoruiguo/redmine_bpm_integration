@@ -1,7 +1,11 @@
  <%= stylesheet_link_tag "process_instances/process_instance_image_link", plugin: "bpm_integration" %>
  <%= javascript_include_tag "process_instances/process_instance_image_link", plugin: "bpm_integration" %>
 
-<%= button_tag(l(:view_process_instance), :class => "popup-bpm-diagram") if @issue.process_instance %>
+<%= button_tag(l(:view_process_instance), :class => "popup-bpm-diagram") if issue.process_instance %>
 <div id="teste-dialog2">
-	<%= image_tag(process_instance_path(@issue.id), :class => 'diagram-bpm') %>
+	<h2>	
+		<%= issue.process_instance.completed ? "Processo Completo" : "Status do Processo" %> 
+
+	</h2>
+	<%= image_tag(process_instance_path(issue.id, format: "png"), :class => 'diagram-bpm') %>
 </div> 

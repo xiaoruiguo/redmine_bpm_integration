@@ -5,3 +5,19 @@
     margin-bottom: 100px;
 }
 
+button.popup-bpm-diagram {
+    border: none;
+    background-color: #F6F6F6;
+    margin-left: 0px;
+    padding-left: 0px;
+    margin-bottom: 15px;
+    color: #2E7E7D;
+}
+
+button.popup-bpm-diagram:focus {
+    outline: none;
+}
+
+button.popup-bpm-diagram:hover {
+    color: #ECB11F;
+}

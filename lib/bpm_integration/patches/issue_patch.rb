@@ -35,34 +35,44 @@ module BpmIntegration
           !self.human_task_issue.blank?
         end
 
+        def bpm_form_fields
+          if is_human_task?
+            @bpm_form_fields ||= human_task_issue.task_definition.form_fields
+          elsif tracker && tracker.is_bpm_process?
+            @bpm_form_fields ||= tracker.process_definition.form_fields
+          else
+            []
+          end
+        end
+
         def available_custom_fields_with_bpm_form_fields
           custom_fields = available_custom_fields_without_bpm_form_fields
-          custom_fields = custom_fields | human_task_issue.task_definition.form_fields
-                .select{ |ff| ff.readable }.map(&:custom_field) if is_human_task?
-          custom_fields = custom_fields | tracker.process_definition.form_fields
-                .select{ |ff| ff.readable }
-                .map(&:custom_field) if !is_human_task? && tracker && tracker.is_bpm_process?
+          custom_fields = (custom_fields | available_bpm_form_fields(bpm_form_fields)) unless bpm_form_fields.blank?
           custom_fields
+        end
+
+        def available_bpm_form_fields(form_fields)
+          form_fields.select{ |ff| ff.readable }.map(&:custom_field)
         end
 
         def read_only_attribute_names_with_bpm_form_fields(user = nil)
-          custom_fields = read_only_attribute_names_without_bpm_form_fields(user)
-          custom_fields = custom_fields | human_task_issue.task_definition.form_fields
-                .select{ |ff| !ff.writable }.map{ |ff| ff.custom_field.id.to_s } if is_human_task?
-          custom_fields = custom_fields | tracker.process_definition.form_fields
-                .select{ |ff| !ff.writable }
-                .map{ |ff| ff.custom_field.id.to_s } if !is_human_task? && tracker && tracker.is_bpm_process?
-          custom_fields
+          cf_names = read_only_attribute_names_without_bpm_form_fields(user)
+          cf_names = (cf_names | read_only_bpm_form_fields_names(bpm_form_fields, user)) unless bpm_form_fields.blank?
+          cf_names
+        end
+
+        def read_only_bpm_form_fields_names(form_fields, user = nil)
+          form_fields.select{ |ff| !ff.writable }.map{ |ff| ff.custom_field.id.to_s }
         end
 
         def required_attribute_names_with_bpm_form_fields(user = nil)
-          custom_fields = required_attribute_names_without_bpm_form_fields(user)
-          custom_fields = custom_fields | human_task_issue.task_definition.form_fields
-                  .select{ |ff| ff.required }.map{ |ff| ff.custom_field.id.to_s } if is_human_task?
-          custom_fields = custom_fields | tracker.process_definition.form_fields
-                  .select{ |ff| ff.required }
-                  .map{ |ff| ff.custom_field.id.to_s } if !is_human_task? && tracker && tracker.is_bpm_process?
-          custom_fields
+          cf_names = required_attribute_names_without_bpm_form_fields(user)
+          cf_names = (cf_names | required_bpm_form_fields_names(bpm_form_fields, user)) unless bpm_form_fields.blank?
+          cf_names
+        end
+
+        def required_bpm_form_fields_names(form_fields, user = nil)
+          form_fields.select{ |ff| ff.required }.map{ |ff| ff.custom_field.id.to_s }
         end
 
         def start_process_instance

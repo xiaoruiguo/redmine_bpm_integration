@@ -75,13 +75,16 @@ class ProcessDefinitionsController < BpmController
       logger.error response.code
       logger.error response.message
       logger.error response["exception"]
-      if print_error == true
-        msg_code = print_msg
-      end
     end
+
     if error
-      logger.error error.msg
-      error.backtrace.each { |line| logger.error line }
+      print_msg = msg_code.to_s + " " + error.message.to_s
+      logger.error error.message
+      error.backtrace.each { |line| logger.error line } 
+    end
+
+    if print_error == true
+      msg_code = print_msg
     end
 
     redirect_to :back, flash: {error: msg_code }

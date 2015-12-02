@@ -15,8 +15,20 @@ class BpmTaskService < ActivitiBpmService
     return tasks
   end
 
+  def self.update_task_default_fields(task_id, issue)
+    put(
+      '/runtime/tasks/' + task_id,
+      basic_auth: @@auth,
+      body: update_default_fields_request_body(issue),
+      headers: { 'Content-Type' => 'application/json' }
+    )
+  end
+
   def self.resolve_task(issue)
     task_id = issue.human_task_issue.human_task_id
+    response = update_task_default_fields(task_id, issue)
+    return response if response.blank? || response.code.blank? || response.code != 200
+
     variables = form_values(issue)
     post(
       '/runtime/tasks/' + task_id,
@@ -48,13 +60,18 @@ class BpmTaskService < ActivitiBpmService
   def self.resolve_task_request_body(form, issue)
     {
       action: "complete",
-      assignee: issue.assigned_to_id,
-      # dueDate: issue.due_date,
-      # owner: issue.author_id,
-      # priority: issue.priority_id,
-      # category: issue.category_id,
-      # description: issue.description,
       variables: variables_from_hash(form)
+    }.to_json
+  end
+
+  def self.update_default_fields_request_body(issue)
+    {
+      assignee: issue.assigned_to_id,
+      dueDate: issue.due_date,
+      owner: issue.author_id,
+      priority: issue.priority_id,
+      category: issue.category_id,
+      description: issue.description,
     }.to_json
   end
 

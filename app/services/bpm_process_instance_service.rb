@@ -52,6 +52,7 @@ class BpmProcessInstanceService < ActivitiBpmService
       body: start_process_request_body(process_key, business_key, form),
       headers: { 'Content-Type' => 'application/json' }
     )
+    raise hash_process_instance["exception"] if hash_process_instance["exception"]
     BpmProcessInstance.new(hash_process_instance)
   end
 

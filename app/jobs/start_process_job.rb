@@ -14,31 +14,27 @@ class StartProcessJob < ActiveJob::Base
     begin
       form_fields = issue.tracker.process_definition.form_fields
       form_data = form_values(form_fields, issue)
-      response = BpmProcessInstanceService.start_process(
-          issue.tracker.tracker_process_definition.process_definition_key, issue.id, form_data
+      process = BpmProcessInstanceService.start_process(
+        issue.tracker.tracker_process_definition.process_definition_key, issue.id, form_data
       )
-      if response && response.id
-        issue.reload
-        issue.process_instance ||= BpmIntegration::IssueProcessInstance.new
-        issue.process_instance.process_instance_id = response.id
-        issue.process_instance.process_definition = issue.tracker.process_definition
-        issue.process_instance.completed = response.completed
-        issue.process_instance.save!(validate:false)
-        issue.status_id = response.completed ?
-                            Setting.plugin_bpm_integration[:closed_status].to_i :
-                            Setting.plugin_bpm_integration[:doing_status].to_i
+      issue.reload
+      issue.process_instance ||= BpmIntegration::IssueProcessInstance.new
+      issue.process_instance.process_instance_id = process.id
+      issue.process_instance.process_definition = issue.tracker.process_definition
+      issue.process_instance.completed = process.completed
+      issue.process_instance.save!(validate:false)
+      issue.status_id = process.completed ?
+                          Setting.plugin_bpm_integration[:closed_status].to_i :
+                          Setting.plugin_bpm_integration[:doing_status].to_i
 
-        issue.save!(validate:false)
+      issue.save!(validate:false)
 
-        Delayed::Worker.logger.info "#{self.class} - Issue \##{issue.id} - Processo " + issue.process_instance.process_instance_id.to_s + " iniciado com sucesso!"
+      Delayed::Worker.logger.info "#{self.class} - Issue \##{issue.id} - Processo " + issue.process_instance.process_instance_id.to_s + " iniciado com sucesso!"
 
-        #JOB - Atualiza tarefas de um processo
-        SyncBpmTasksJob.perform_now(issue.process_instance.process_instance_id)
-      else
-        handle_error(issue, "Response nula")
-      end
+      #JOB - Atualiza tarefas de um processo
+      SyncBpmTasksJob.perform_now(issue.process_instance.process_instance_id)
     rescue => exception
-      handle_error(issue, exception.message, exception)
+      handle_error(issue, exception)
     end
   end
 
@@ -58,12 +54,13 @@ class StartProcessJob < ActiveJob::Base
     hash_fields.reduce(&:merge)
   end
 
-  def handle_error(issue, msg, e = nil)
+  def handle_error(issue, e)
     Delayed::Worker.logger.error l('error_process_start')
-    Delayed::Worker.logger.error msg
+    Delayed::Worker.logger.error e.message
     e.backtrace.each { |line| Delayed::Worker.logger.error line }
+    Delayed::Worker.logger.error "\n\n"
     user = User.find(Setting.plugin_bpm_integration[:bpm_user])
-    Journal.new(:journalized => issue, :user => user, :notes => l('error_process_start') + ":  #{msg}", :private_notes => true).save
+    Journal.new(:journalized => issue, :user => user, :notes => l('error_process_start') + ":  #{e.message}", :private_notes => true).save
   end
 
 end

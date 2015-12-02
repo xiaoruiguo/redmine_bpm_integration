@@ -90,7 +90,7 @@ class SyncBpmTasksJob < ActiveJob::Base
   end
 
   def get_assignee_id(task_assignee)
-    task_assignee.is_a?(Integer) ? (Principal.where(id: task_assignee.to_i).pluck(:id).first) : nil
+    Principal.where(id: task_assignee.to_i).pluck(:id).first
   end
 
   def build_human_task_issue(task, task_definition)

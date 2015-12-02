@@ -24,7 +24,7 @@
 
     <% @process_definitions.each do |process| %>
       <tr>
-        <td><%= button_tag(process.name, 'data-url' => process_definition_path(process, format: "png"), class: 'bpm_diagram' )  %></td>
+        <td><%= link_to process.name, "javascript:void(0);", 'data-url' => process_definition_path(process, format: "png"), class: 'popup_bpm_diagram'  %></td>
         <td><%= process.description %></td>
         <td><%= process.try(&:tracker_process_definition).try(&:tracker).try(&:name) %></td>
         <td><%= process.version %></td>

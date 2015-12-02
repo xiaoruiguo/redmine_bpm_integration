@@ -10,7 +10,7 @@ function performUploadClick(node)
 }
 
 $(function() {
-  $('.bpm_diagram').click(function() {   
+  $('.popup_bpm_diagram').click(function() {   
   	var image = $('<img />').attr('src', $(this).data('url')).load(function() {
       $("#diagram_loader").html($(this)); 
 	    $('#diagram_loader').dialog({

@@ -31,6 +31,7 @@ pt-BR:
   error_process_instance_job: 'Ocorreu um erro ao tentar sincronizar com o processo do BPMs'
   error_process_start: 'Ocorreu um erro ao iniciar um novo processo.'
   error_bpm_tasks_job: 'Ocorreu um erro ao tentar sincronizar a lista de tarefas com o BPMs.'
+  msg_issue_closed_error: 'Ocorreu um erro ao tentar concluir o chamado.'
 
   #Diagram Image
   process_finished_image: 'Processo Concluído'

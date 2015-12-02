@@ -83,8 +83,13 @@ module BpmIntegration
 
         def close_human_task
           return nil if Issue.find(self.id).status.is_closed || self.human_task_issue.human_task_id.blank?
+          begin
+            response = BpmTaskService.resolve_task(self)
+          rescue => error 
+            handle_error(l('msg_issue_closed_error'), Issue.find(self.id).id, error)
 
-          response = BpmTaskService.resolve_task(self)
+            return false
+          end
           if response != nil && response.code == 200
             logger.info "#{self.class} - Tarefa completada no BPMS"
 
@@ -100,6 +105,19 @@ module BpmIntegration
               logger.error response["exception"] if response.is_a? Hash
             rescue;end
           end
+        end
+
+        def handle_error(msg_code, id, error = nil, response = nil, print_error = false)
+          logger.error self.class                  
+          print_msg = msg_code.to_s + " " + error.message.to_s
+          logger.error error.message
+          error.backtrace.each { |line| logger.error line }           
+
+          if print_error == true
+            msg_code = print_msg
+          end
+
+          errors[:base] << msg_code
         end
       end
     end

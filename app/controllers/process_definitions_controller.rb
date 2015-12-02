@@ -45,10 +45,10 @@ class ProcessDefinitionsController < BpmController
         SyncProcessDefinitionsJob.perform_now(response["id"])
         handle_sucess('msg_process_uploaded')
       else
-        handle_error('msg_process_upload_error')
+        handle_error(l('msg_process_upload_error'), nil, response, true)
       end
     rescue => error
-      handle_error('msg_process_upload_error', error)
+      handle_error(l('msg_process_upload_error'), error)
     end
   end
 
@@ -62,6 +62,29 @@ class ProcessDefinitionsController < BpmController
       end
     end
         
+  end
+
+  def handle_sucess(msg_code)
+    redirect_to :back, notice: l(msg_code)
+  end
+
+  def handle_error(msg_code, error = nil, response = nil, print_error = false)
+    logger.error self.class
+    if response
+      print_msg = msg_code.to_s + " - " + response.message.to_s + " - " + response.code.to_s + " - " + response["exception"].to_s
+      logger.error response.code
+      logger.error response.message
+      logger.error response["exception"]
+      if print_error == true
+        msg_code = print_msg
+      end
+    end
+    if error
+      logger.error error.msg
+      error.backtrace.each { |line| logger.error line }
+    end
+
+    redirect_to :back, flash: {error: msg_code }
   end
 
 end

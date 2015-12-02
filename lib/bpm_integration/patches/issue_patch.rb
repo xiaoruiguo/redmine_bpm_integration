@@ -82,49 +82,25 @@ module BpmIntegration
         end
 
         def close_human_task
-          return if Issue.find(self.id).status.is_closed
+          return nil if Issue.find(self.id).status.is_closed || self.human_task_issue.human_task_id.blank?
 
-          task_id = self.human_task_issue.human_task_id
-          if !task_id.blank?
-            form_fields = self.human_task_issue.task_definition.form_fields
-            form_data = form_values(form_fields)
-            response = BpmTaskService.resolve_task(task_id, form_data)
-            if response != nil && response.code == 200
-              logger.info "#{self.class} - Tarefa completada no BPMS"
+          response = BpmTaskService.resolve_task(self)
+          if response != nil && response.code == 200
+            logger.info "#{self.class} - Tarefa completada no BPMS"
 
-              #JOB - Atualiza tarefas de um processo
-              SyncBpmTasksJob.perform_now(self.parent.process_instance.process_instance_id)
+            #JOB - Atualiza tarefas de um processo
+            SyncBpmTasksJob.perform_now(self.parent.process_instance.process_instance_id)
 
-              #JOB - Atualiza process_instances
-              SyncProcessInstancesJob.perform_now(self.parent.process_instance)
+            #JOB - Atualiza process_instances
+            SyncProcessInstancesJob.perform_now(self.parent.process_instance)
 
-            else
-              logger.error "#{self.class} - Ocorreu um problema ao completar tarefa no BPMS. " + response.response.code + " - " + response.response.msg
-              begin
-                logger.error response["exception"] if response.is_a? Hash
-              rescue;end
-            end
+          else
+            logger.error "#{self.class} - Ocorreu um problema ao completar tarefa no BPMS. " + response.response.code + " - " + response.response.msg
+            begin
+              logger.error response["exception"] if response.is_a? Hash
+            rescue;end
           end
         end
-
-        private
-
-        def form_values(form_fields)
-          form_fields ||= []
-          hash_fields = form_fields.map do |ff|
-            field_value = (
-              self.custom_field_values.select do |cfv|
-                ff.custom_field && (cfv.custom_field_id == ff.custom_field.id)
-              end
-            ).first.try(&:value)
-            if field_value
-              field_value = field_value.gsub('=>',':') if (ff.custom_field.field_format == "grid")
-            end
-            { ff.field_id => field_value }
-          end
-          hash_fields.reduce(&:merge)
-        end
-
       end
     end
   end

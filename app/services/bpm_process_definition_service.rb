@@ -64,4 +64,11 @@ class BpmProcessDefinitionService < ActivitiBpmService
     )
   end
 
+  def self.data_objects(process_id)
+    get(
+      "/repository/process-definitions/#{process_id}/model",
+      basic_auth: @@auth
+    )["mainProcess"]["dataObjects"]
+  end
+
 end

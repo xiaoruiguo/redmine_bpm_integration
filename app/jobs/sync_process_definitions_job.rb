@@ -40,6 +40,7 @@ class SyncProcessDefinitionsJob < ActiveJob::Base
   def save_process_definition(process)
     new_process = build_process_definition(process)
     new_process.form_fields = synchronize_form_fields(new_process)
+    synchronize_process_constants(new_process)
     preset_previous_version_configurations(new_process)
     new_process.task_definitions = synchronize_task_definitions(new_process)
     new_process.save!(validate:false)
@@ -63,6 +64,14 @@ class SyncProcessDefinitionsJob < ActiveJob::Base
       next if last_field.blank?
       field.custom_field = last_field.custom_field
     end
+  end
+
+  def synchronize_process_constants(process)
+    data_objects = BpmProcessDefinitionService.data_objects(process.process_identifier)
+    process_constants = data_objects.map do |data_object|
+      BpmIntegration::ProcessConstant.new(name: data_object['name'], constant_type: data_object['value'])
+    end
+    process.constants = process_constants
   end
 
   def synchronize_form_fields(process)

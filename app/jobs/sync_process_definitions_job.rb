@@ -69,7 +69,11 @@ class SyncProcessDefinitionsJob < ActiveJob::Base
   def synchronize_process_constants(process)
     data_objects = BpmProcessDefinitionService.data_objects(process.process_identifier)
     process_constants = data_objects.map do |data_object|
-      BpmIntegration::ProcessConstant.new(name: data_object['name'], constant_type: data_object['value'])
+      BpmIntegration::ProcessConstant.new(
+                                  identifier: data_object['name'],
+                                  name: data_object['name'],
+                                  constant_type: data_object['value']
+                                )
     end
     process.constants = process_constants
   end

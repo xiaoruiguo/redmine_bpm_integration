@@ -7,6 +7,7 @@ class BpmIntegration::ProcessDefinition < BpmIntegrationBaseModel
   has_many :form_field_definitions, autosave: true, dependent: :destroy
   has_many :issue_process_instance
   has_many :constants, autosave: true, dependent: :destroy, class_name: 'BpmIntegration::ProcessConstant'
+  has_many :end_events, autosave: true, dependent: :destroy, class_name: 'BpmIntegration::ProcessEndEvent'
 
   scope :latest, -> {joins('join ' +
                             '(select pd.key as p_key, max(pd.version) as max_version ' +

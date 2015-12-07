@@ -12,15 +12,17 @@ class StartProcessJob < ActiveJob::Base
   def start_bpm_process(issue_id)
     issue = Issue.find(issue_id)
     begin
-      form_fields = issue.tracker.process_definition.form_fields
-      form_data = form_values(form_fields, issue)
+      process_definition = issue.tracker.process_definition
+      form_data = form_values(process_definition.form_fields, issue)
+      constants = process_constants(process_definition.constants)
+      variables = form_data.merge(constants)
       process = BpmProcessInstanceService.start_process(
-        issue.tracker.tracker_process_definition.process_definition_key, issue.id, form_data
+        process_definition.key, issue.id, variables
       )
       issue.reload
       issue.process_instance ||= BpmIntegration::IssueProcessInstance.new
       issue.process_instance.process_instance_id = process.id
-      issue.process_instance.process_definition = issue.tracker.process_definition
+      issue.process_instance.process_definition = process_definition
       issue.process_instance.completed = process.completed
       issue.process_instance.save!(validate:false)
       issue.status_id = process.completed ?
@@ -36,6 +38,13 @@ class StartProcessJob < ActiveJob::Base
     rescue => exception
       handle_error(issue, exception)
     end
+  end
+
+  private
+
+  def process_constants(constants)
+    return {} if constants.blank?
+    constants.map { |c| { c.identifier => c.value } }.reduce(&:merge)
   end
 
   def form_values(form_fields, issue)

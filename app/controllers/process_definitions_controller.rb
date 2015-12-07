@@ -30,6 +30,10 @@ class ProcessDefinitionsController < BpmController
       ffd.custom_field_id = params[:bpm_integration_process_definition][:form_field_definitions][ffd.id.to_s]
     end
 
+    @process_definition.constants.each do |const|
+      const.value = params[:bpm_integration_process_definition][:constants][const.id.to_s]
+    end
+
     @process_definition.save!
 
     flash[:notice] = t(:notice_successful_update)
@@ -61,7 +65,7 @@ class ProcessDefinitionsController < BpmController
         send_data process_image, :type => 'image/png',:disposition => 'inline'
       end
     end
-        
+
   end
 
   def handle_sucess(msg_code)
@@ -80,7 +84,7 @@ class ProcessDefinitionsController < BpmController
     if error
       print_msg = msg_code.to_s + " " + error.message.to_s
       logger.error error.message
-      error.backtrace.each { |line| logger.error line } 
+      error.backtrace.each { |line| logger.error line }
     end
 
     if print_error == true

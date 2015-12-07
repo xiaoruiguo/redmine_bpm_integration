@@ -16,6 +16,7 @@
 
   </div>
 </div>
+
 <div class="splitcontentright">
   <div class="box tabular">
     <h4> <%= t(:title_process_definition_custom_fields) %> </h4>
@@ -34,7 +35,20 @@
         </p>
         <% end %>
       <% end %>
+  </div>
+</div>
 
+<div class="splitcontentleft">
+  <div class="box tabular">
+    <h4> <%= t(:title_process_definition_tracker) %> </h4>
+    <% @process_definition.constants.each do |constant| %>
+      <%= f.fields_for :constants, constant do |f_constants| %>
+        <p>
+          <%= f_constants.label :constant_id, "#{f_constants.object.name} <span class='required'> *</span>".html_safe, class: 'bpm-form-label' %>
+          <%= process_constants_component(f_constants, f_constants.object) %>
+        </p>
+      <% end %>
+    <% end %>
   </div>
 </div>
 <%= submit_tag t(:button_save) %>

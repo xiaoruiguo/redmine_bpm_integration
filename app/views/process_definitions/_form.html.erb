@@ -17,38 +17,61 @@
   </div>
 </div>
 
-<div class="splitcontentright">
-  <div class="box tabular">
-    <h4> <%= t(:title_process_definition_custom_fields) %> </h4>
-      <% @process_definition.form_field_definitions.each do |ffd| %>
-        <%= f.fields_for :form_field_definitions, ffd do |ffd_fields| %>
-        <p>
-          <%= label_tag :tracker, "#{ffd.name} <span class='required'> *</span>".html_safe, class: 'bpm-form-label' %>
-          <%= select_tag("#{ffd_fields.object_name}[#{ffd.id}]", options_from_collection_for_select(
-                                          IssueCustomField.all, :id, :name,
-                                          ffd.custom_field_id
-              ),
-              include_blank: true,
-              index: :field_id
-            )
-          %>
-        </p>
+<%if !@process_definition.form_field_definitions.blank? %>
+  <div class="splitcontentright">
+    <div class="box tabular">
+      <h4> <%= t(:title_process_definition_custom_fields) %> </h4>
+        <% @process_definition.form_field_definitions.each do |ffd| %>
+          <%= f.fields_for :form_field_definitions, ffd do |ffd_fields| %>
+          <p>
+            <%= label_tag :tracker, "#{ffd.name} <span class='required'> *</span>".html_safe, class: 'bpm-form-label' %>
+            <%= select_tag("#{ffd_fields.object_name}[#{ffd.id}]", options_from_collection_for_select(
+                                            IssueCustomField.all, :id, :name,
+                                            ffd.custom_field_id
+                ),
+                include_blank: true,
+                index: :field_id
+              )
+            %>
+          </p>
+          <% end %>
+        <% end %>
+    </div>
+  </div>
+<%end%>
+
+<%if !@process_definition.constants.blank? && !@process_definition.end_events.blank?%>
+  <div class="splitcontentleft">
+    <div class="box tabular">
+      <%if !@process_definition.constants.blank?%>
+        <h4> <%= t(:title_process_constants) %> </h4>
+        <% @process_definition.constants.each do |constant| %>
+          <%= f.fields_for :constants, constant do |f_constants| %>
+            <p>
+              <%= f_constants.label :constant_id, "#{f_constants.object.name} <span class='required'> *</span>".html_safe, class: 'bpm-form-label' %>
+              <%= process_constants_component(f_constants, f_constants.object) %>
+            </p>
+          <% end %>
         <% end %>
       <% end %>
-  </div>
-</div>
-
-<div class="splitcontentleft">
-  <div class="box tabular">
-    <h4> <%= t(:title_process_definition_tracker) %> </h4>
-    <% @process_definition.constants.each do |constant| %>
-      <%= f.fields_for :constants, constant do |f_constants| %>
-        <p>
-          <%= f_constants.label :constant_id, "#{f_constants.object.name} <span class='required'> *</span>".html_safe, class: 'bpm-form-label' %>
-          <%= process_constants_component(f_constants, f_constants.object) %>
-        </p>
+      <%if !@process_definition.end_events.blank?%>
+        <h4> <%= t(:title_process_end_events) %> </h4>
+        <% @process_definition.end_events.each do |end_event| %>
+          <%= f.fields_for :end_events do |f_end_event| %>
+            <p>
+              <%= label_tag :issue_status, "#{end_event.name} <span class='required'> *</span>".html_safe, class: 'bpm-form-label' %>
+              <%= f_end_event.select(end_event.id, options_from_collection_for_select(
+                                              IssueStatus.all, :id, :name,
+                                              end_event.issue_status_id
+                  ),
+                  include_blank: true,
+                )
+              %>
+            </p>
+          <% end %>
+        <% end %>
       <% end %>
-    <% end %>
+    </div>
   </div>
-</div>
+<%end%>
 <%= submit_tag t(:button_save) %>

@@ -34,6 +34,10 @@ class ProcessDefinitionsController < BpmController
       const.value = params[:bpm_integration_process_definition][:constants][const.id.to_s]
     end
 
+    @process_definition.end_events.each do |end_event|
+      end_event.issue_status_id = params[:bpm_integration_process_definition][:end_events][end_event.id.to_s]
+    end
+
     @process_definition.save!
 
     flash[:notice] = t(:notice_successful_update)

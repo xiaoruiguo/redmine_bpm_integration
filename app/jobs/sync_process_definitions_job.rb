@@ -40,7 +40,7 @@ class SyncProcessDefinitionsJob < ActiveJob::Base
   def save_process_definition(process)
     new_process = build_process_definition(process)
     new_process.form_fields = synchronize_form_fields(new_process)
-    synchronize_process_constants(new_process)
+    synchronize_data_objects(new_process)
     preset_previous_version_configurations(new_process)
     new_process.task_definitions = synchronize_task_definitions(new_process)
     new_process.save!(validate:false)
@@ -66,16 +66,29 @@ class SyncProcessDefinitionsJob < ActiveJob::Base
     end
   end
 
-  def synchronize_process_constants(process)
+  #Synchronize constants and end_events from data_objects defined in Activiti
+  def synchronize_data_objects(process)
     data_objects = BpmProcessDefinitionService.data_objects(process.process_identifier)
-    process_constants = data_objects.map do |data_object|
-      BpmIntegration::ProcessConstant.new(
-                                  identifier: data_object['name'],
-                                  name: data_object['name'],
-                                  constant_type: data_object['value']
-                                )
+    process_constants = []
+    process_end_events = []
+
+    data_objects.map do |data_object|
+      if data_object['value'] == "end_event"
+        process_end_events << BpmIntegration::ProcessEndEvent.new(
+          identifier: data_object['name'],
+          name: data_object['id']
+        )
+      else
+        process_constants << BpmIntegration::ProcessConstant.new(
+                                    identifier: data_object['name'],
+                                    name: data_object['id'],
+                                    constant_type: data_object['value']
+                                  )
+      end
     end
+
     process.constants = process_constants
+    process.end_events = process_end_events
   end
 
   def synchronize_form_fields(process)

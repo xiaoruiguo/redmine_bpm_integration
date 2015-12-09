@@ -48,12 +48,16 @@ class ProcessDefinitionsController < BpmController
     begin
       process_data = params[:bpm_process_definition][:upload].tempfile
       response = BpmProcessDefinitionService.deploy_process(process_data)
-      if !response.blank? && response.code == 201
+      begin
+        if !response.blank? && response.code == 201
         #JOB - Atualiza process_definitions (specific)
         SyncProcessDefinitionsJob.perform_now(response["id"])
         handle_sucess('msg_process_uploaded')
-      else
-        handle_error(l('msg_process_upload_error'), nil, response, true)
+        else
+          handle_error(l('msg_process_upload_error'), nil, response, true)
+        end
+      rescue => error
+        handle_error(l('msg_process_upload_error'), error)
       end
     rescue => error
       handle_error(l('msg_process_upload_error'), error, nil, true)

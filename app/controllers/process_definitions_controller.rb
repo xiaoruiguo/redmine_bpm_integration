@@ -56,7 +56,7 @@ class ProcessDefinitionsController < BpmController
         handle_error(l('msg_process_upload_error'), nil, response, true)
       end
     rescue => error
-      handle_error(l('msg_process_upload_error'), error)
+      handle_error(l('msg_process_upload_error'), error, nil, true)
     end
   end
 

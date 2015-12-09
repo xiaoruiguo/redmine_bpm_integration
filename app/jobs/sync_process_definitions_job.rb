@@ -41,8 +41,8 @@ class SyncProcessDefinitionsJob < ActiveJob::Base
     new_process = build_process_definition(process)
     new_process.form_fields = synchronize_form_fields(new_process)
     synchronize_data_objects(new_process)
-    preset_previous_version_configurations(new_process)
     new_process.task_definitions = synchronize_task_definitions(new_process)
+    preset_previous_version_configurations(new_process)
     new_process.save!(validate:false)
     Delayed::Worker.logger.info "#{self.class} - Cadastro de definição do processo " + process.id.to_s + " realizado com sucesso!"
   end
@@ -50,8 +50,11 @@ class SyncProcessDefinitionsJob < ActiveJob::Base
   def preset_previous_version_configurations(process)
     last_version = BpmIntegration::ProcessDefinition.where(key:process.key).where.not(id:process.id).order('version desc').first
     return if last_version.blank?
+
     preset_form_field_definitions(process, last_version)
     preset_process_tracker(process, last_version)
+    preset_process_constants(process, last_version)
+    preset_process_end_events(process, last_version)
   end
 
   def preset_process_tracker(process, last_version)
@@ -63,6 +66,26 @@ class SyncProcessDefinitionsJob < ActiveJob::Base
       last_field = last_version.form_field_definitions.where(field_id:field.field_id).first
       next if last_field.blank?
       field.custom_field = last_field.custom_field
+    end
+  end
+
+  def preset_process_constants(process, last_version)
+    return unless process.constants
+
+    process.constants.each do |constant|
+      last_constant = last_version.constants.where(identifier:constant.identifier).first
+      next if last_constant.blank? || last_constant.value.blank? || last_constant.constant_type != constant.constant_type
+      constant.value = last_constant.value
+    end
+  end
+
+  def preset_process_end_events(process, last_version)
+    return unless process.end_events
+
+    process.end_events.each do |end_event|
+      last_end_event = last_version.end_events.where(identifier:end_event.identifier).first
+      next if last_end_event.blank? || last_end_event.issue_status.blank?
+      end_event.issue_status_id = last_end_event.issue_status_id
     end
   end
 
@@ -157,7 +180,7 @@ class SyncProcessDefinitionsJob < ActiveJob::Base
           .first_or_create do |ffd|
       ffd.process_definition = process
       ffd.name = form_item_hash["name"]
-      ffd.field_type = form_item_hash["type"]
+      ffd.field_type = form_item_hash["type"]["name"] if form_item_hash["type"]
     end
   end
 

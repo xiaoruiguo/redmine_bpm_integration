@@ -55,6 +55,9 @@
         <% end %>
       <% end %>
       <%if !@process_definition.end_events.blank?%>
+        <%if !@process_definition.constants.blank?%>
+          <br/>
+        <% end %>
         <h4> <%= t(:title_process_end_events) %> </h4>
         <% @process_definition.end_events.each do |end_event| %>
           <%= f.fields_for :end_events do |f_end_event| %>

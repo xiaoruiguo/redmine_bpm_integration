@@ -16,7 +16,6 @@ class BpmProcessDefinitionService < ActivitiBpmService
       query: { deploymentId: deployment_id },
       basic_auth: @@auth
     )["data"].first
-
     BpmProcessDefinition.new(process)
   end
 

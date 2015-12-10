@@ -44,7 +44,7 @@ class SyncProcessDefinitionsJob < ActiveJob::Base
     new_process.task_definitions = synchronize_task_definitions(new_process)
     preset_previous_version_configurations(new_process)
     new_process.save!(validate:false)
-    Delayed::Worker.logger.info "#{self.class} - Cadastro de definição do processo " + process.id.to_s + " realizado com sucesso!"
+    Delayed::Worker.logger.info "#{self.class} - Cadastro de definição do processo #{process.id.to_s} (#{new_process.version}) realizado com sucesso!"
   end
 
   def preset_previous_version_configurations(process)

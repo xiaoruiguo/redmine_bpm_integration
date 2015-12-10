@@ -31,8 +31,9 @@ class BpmProcessDefinitionService < ActivitiBpmService
     end
     return processes
   rescue => e
-    puts "Ocorreu um erro ao acessar a url " + base_uri
-    puts e
+    logger.error "Ocorreu um erro ao acessar a url " + base_uri
+    logger.error e.message
+    logger.error e.backtrace
     raise "Ocorreu um erro inesperado. Entre em contato com o suporte."
   end
 

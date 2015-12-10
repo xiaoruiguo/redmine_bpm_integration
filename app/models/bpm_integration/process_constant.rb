@@ -1,5 +1,5 @@
 class BpmIntegration::ProcessConstant < BpmIntegrationBaseModel
 
-  belongs_to :process_definition
+  belongs_to :process_definition_version
 
 end

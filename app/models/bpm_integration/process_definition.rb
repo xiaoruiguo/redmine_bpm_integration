@@ -1,18 +1,11 @@
-
 class BpmIntegration::ProcessDefinition < BpmIntegrationBaseModel
 
-  belongs_to :tracker_process_definition
-  has_many :task_definitions
-  has_many :form_fields, class_name: 'BpmIntegration::FormField', as: :form_able
-  has_many :form_field_definitions, autosave: true, dependent: :destroy
-  has_many :issue_process_instance
-  has_many :constants, autosave: true, dependent: :destroy, class_name: 'BpmIntegration::ProcessConstant'
-  has_many :end_events, autosave: true, dependent: :destroy, class_name: 'BpmIntegration::ProcessEndEvent'
+  has_one :tracker_process_definition
+  has_one :tracker, through: :tracker_process_definition
+  has_many :versions, class_name: 'ProcessDefinitionVersion'
 
-  scope :latest, -> {joins('join ' +
-                            '(select pd.key as p_key, max(pd.version) as max_version ' +
-                              'from bpmint_process_definitions pd group by pd.key) as tmp ' +
-                               'on bpmint_process_definitions.key = tmp.p_key ' +
-                               'and bpmint_process_definitions.version = tmp.max_version')}
+  has_one :active_version, ->() { where(bpmint_process_def_versions: { active: true }) },
+                          class_name: 'ProcessDefinitionVersion'
 
+  validates :key, uniqueness: true
 end

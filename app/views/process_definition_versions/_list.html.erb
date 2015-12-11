@@ -9,6 +9,7 @@
       <th><%=t(:process_description)%></th>
       <th><%=t(:label_tracker)%></th>
       <th><%=t(:process_version)%></th>
+      <th><%=t(:active)%></th>
       <th></th>
     </tr>
 
@@ -19,6 +20,7 @@
         <td><%= process.description %></td>
         <td><%= process.try(&:process_definition).try(&:tracker).try(&:name) %></td>
         <td><%= process.version %></td>
+        <td><%= checked_image process.active? %></td>
         <td><%= link_to t(:button_edit), edit_bpm_integration_process_definition_version_path(process) %></td>
       </tr>
       <div id = "diagram_loader">

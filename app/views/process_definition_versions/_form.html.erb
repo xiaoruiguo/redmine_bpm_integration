@@ -1,20 +1,10 @@
-<%if !@process_definition_version.form_field_definitions.blank? %>
-  <div class="splitcontentright">
-    <div class="box tabular">
-      <h4> <%= t(:title_process_definition_custom_fields) %> </h4>
-          <%= f.fields_for :form_field_definitions do |ffd_fields| %>
-          <p>
-            <%= ffd_fields.label :custom_field_id, "#{ffd_fields.object.name} <span class='required'> *</span>".html_safe, class: 'bpm-form-label' %>
-            <%= ffd_fields.collection_select :custom_field_id, IssueCustomField.all, :id, :name, include_blank: true %>
-          </p>
-          <% end %>
-    </div>
-  </div>
-<%end%>
-
-<%if !@process_definition_version.constants.blank? || !@process_definition_version.end_events.blank?%>
-  <div class="splitcontentleft">
-    <div class="box tabular">
+<div class="splitcontentleft">
+  <div class="box tabular">
+    <p>
+      <%= f.label :active %>
+      <%= f.check_box :active %>
+    </p>
+    <%if !@process_definition_version.constants.blank? || !@process_definition_version.end_events.blank?%>
       <%if !@process_definition_version.constants.blank?%>
         <h4> <%= t(:title_process_constants) %> </h4>
           <%= f.fields_for :constants do |f_constants| %>
@@ -36,6 +26,20 @@
             </p>
         <% end %>
       <% end %>
+    <%end%>
+  </div>
+</div>
+
+<%if !@process_definition_version.form_field_definitions.blank? %>
+  <div class="splitcontentright">
+    <div class="box tabular">
+      <h4> <%= t(:title_process_definition_custom_fields) %> </h4>
+          <%= f.fields_for :form_field_definitions do |ffd_fields| %>
+          <p>
+            <%= ffd_fields.label :custom_field_id, "#{ffd_fields.object.name} <span class='required'> *</span>".html_safe, class: 'bpm-form-label' %>
+            <%= ffd_fields.collection_select :custom_field_id, IssueCustomField.all, :id, :name, include_blank: true %>
+          </p>
+          <% end %>
     </div>
   </div>
 <%end%>

@@ -15,12 +15,12 @@ class ProcessDefinitionVersionsController < BpmController
     @process_definition_version.update_attributes!(safe_params)
 
     flash[:notice] = t(:notice_successful_update)
-    redirect_to bpm_integration_process_definitions_path
+    redirect_to edit_bpm_integration_process_definition_path(@process_definition_version.process_definition)
   end
 
   def safe_params
     params.require(:bpm_integration_process_definition_version)
-          .permit(:name, form_field_definitions_attributes: [:id, :custom_field_id],
+          .permit(:active, :name, form_field_definitions_attributes: [:id, :custom_field_id],
           constants_attributes: [:id, :value],
           end_events_attributes: [:id, :issue_status_id])
   end

@@ -27,13 +27,20 @@ class ProcessDefinitionsController < BpmController
     )
 
     @process_definition.form_field_definitions.each do |ffd|
-      ffd.custom_field_id = params[:bpm_integration_process_definition][:form_field_definitions][ffd.id.to_s]
+      ffd.custom_field_id = params[:bpm_integration_process_definition][:form_field_definitions][ffd.id.to_s]    
     end
 
-    @process_definition.save!
+    if @process_definition.save      
 
-    flash[:notice] = t(:notice_successful_update)
-    redirect_to action: :index
+      flash[:notice] = t(:notice_successful_update)
+      respond_to do |format|
+        format.html { redirect_to action: :index }
+      end
+    else
+      respond_to do |format|
+        format.html { render :action => 'edit' }
+      end
+    end
   end
 
   def create

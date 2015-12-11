@@ -8,4 +8,7 @@ class BpmIntegration::ProcessDefinition < BpmIntegrationBaseModel
                           class_name: 'ProcessDefinitionVersion'
 
   validates :key, uniqueness: true
+
+  accepts_nested_attributes_for :tracker_process_definition
+
 end

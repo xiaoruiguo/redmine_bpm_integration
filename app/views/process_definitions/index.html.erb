@@ -2,7 +2,7 @@
  <%= javascript_include_tag "process_definitions/index", plugin: "bpm_integration" %>
 
 <div class="contextual">
-  <%= form_tag process_definitions_path, name: "upload_form", multipart: true do %>
+  <%= form_tag bpm_integration_process_definition_versions_path, name: "upload_form", multipart: true do %>
     <%= file_field_tag('bpm_process_definition[upload]', style: 'display: none;') %>
     <%= link_to l('new_process'), '#', class:'icon icon-add', onclick: 'performUploadClick(document.getElementById("bpm_process_definition_upload"));' %>
     <%= submit_tag('', style: 'display: none;')  %>
@@ -24,11 +24,13 @@
 
     <% @process_definitions.each do |process| %>
       <tr>
-        <td><%= link_to process.name, "javascript:void(0);", 'data-url' => process_definition_path(process, format: "png"), class: 'popup_bpm_diagram'  %></td>
-        <td><%= process.description %></td>
-        <td><%= process.try(&:tracker_process_definition).try(&:tracker).try(&:name) %></td>
-        <td><%= process.version %></td>
-        <td><%= link_to t(:button_edit), edit_process_definition_path(process) %></td>
+        <td><%= link_to process.name, "javascript:void(0);", :class => 'popup_bpm_diagram',
+          'data-url' => (process.active_version.blank?? '' :
+                      bpm_integration_process_definition_version_path(process.active_version, format: "png")) %></td>
+        <td><%= process.active_version.try(&:description) %></td>
+        <td><%= process.try(&:tracker).try(&:name) %></td>
+        <td><%= process.active_version.try(&:version) %></td>
+        <td><%= link_to t(:button_edit), edit_bpm_integration_process_definition_path(process) %></td>
       </tr>
       <div id = "diagram_loader">
         <img id="target" src="" />

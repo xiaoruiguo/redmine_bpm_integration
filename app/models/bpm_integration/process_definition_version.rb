@@ -10,4 +10,8 @@ class BpmIntegration::ProcessDefinitionVersion < BpmIntegrationBaseModel
   has_many :constants, autosave: true, dependent: :destroy, class_name: 'ProcessConstant'
   has_many :end_events, autosave: true, dependent: :destroy, class_name: 'ProcessEndEvent'
 
+  accepts_nested_attributes_for :form_field_definitions
+  accepts_nested_attributes_for :constants
+  accepts_nested_attributes_for :end_events
+
 end

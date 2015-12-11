@@ -40,7 +40,7 @@
   </div>
 <%end%>
 
-<%if !@process_definition.constants.blank? && !@process_definition.end_events.blank?%>
+<%if !@process_definition.constants.blank? || !@process_definition.end_events.blank?%>
   <div class="splitcontentleft">
     <div class="box tabular">
       <%if !@process_definition.constants.blank?%>

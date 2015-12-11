@@ -25,6 +25,7 @@ module BpmIntegration
           alias_method_chain :available_custom_fields, :bpm_form_fields
           alias_method_chain :read_only_attribute_names, :bpm_form_fields
           alias_method_chain :required_attribute_names, :bpm_form_fields
+          alias_method_chain :tracker=, :bpm_form_fields
 
         end
       end
@@ -33,6 +34,11 @@ module BpmIntegration
 
         def is_human_task?
           !self.human_task_issue.blank?
+        end
+
+        def tracker_with_bpm_form_fields= (new_tracker)
+          @bpm_form_fields = nil if self.tracker != new_tracker
+          self.tracker_without_bpm_form_fields = new_tracker
         end
 
         def bpm_form_fields
@@ -85,7 +91,7 @@ module BpmIntegration
           return nil if Issue.find(self.id).status.is_closed || self.human_task_issue.human_task_id.blank?
           begin
             response = BpmTaskService.resolve_task(self)
-          rescue => error 
+          rescue => error
             handle_error(l('msg_issue_closed_error'), Issue.find(self.id).id, error)
 
             return false
@@ -108,10 +114,10 @@ module BpmIntegration
         end
 
         def handle_error(msg_code, id, error = nil, response = nil, print_error = false)
-          logger.error self.class                  
+          logger.error self.class
           print_msg = msg_code.to_s + " " + error.message.to_s
           logger.error error.message
-          error.backtrace.each { |line| logger.error line }           
+          error.backtrace.each { |line| logger.error line }
 
           if print_error == true
             msg_code = print_msg

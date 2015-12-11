@@ -18,7 +18,11 @@ module BpmIntegration
       module InstanceMethods
 
         def is_bpm_process?
-          !self.process_definition.nil?
+          self.process_definition && self.process_definition.is_active?
+        end
+
+        def process_active_version
+          self.is_bpm_process? && self.process_definition.active_version
         end
 
       end

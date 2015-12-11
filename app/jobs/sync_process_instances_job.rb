@@ -59,7 +59,7 @@ class SyncProcessInstancesJob < ActiveJob::Base
   end
 
   def update_status(issue_process_instance, historic_process, issue)
-    end_events = issue_process_instance.process_definition.end_events
+    end_events = issue_process_instance.process_definition_version.end_events
     end_event_id = historic_process.endActivityId
 
     if !end_events.blank?

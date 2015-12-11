@@ -11,4 +11,12 @@ class BpmIntegration::ProcessDefinition < BpmIntegrationBaseModel
 
   accepts_nested_attributes_for :tracker_process_definition
 
+  def form_fields
+    is_active? ? active_version.form_fields : []
+  end
+
+  def is_active?
+    !active_version.blank?
+  end
+
 end

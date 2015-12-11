@@ -14,7 +14,7 @@ class SyncProcessDefinitionsJob < ActiveJob::Base
   def synchronize_process_list
     Delayed::Worker.logger.info "#{self.class} - Sincronizando process_definitions"
     BpmProcessDefinitionService.process_list.each do |process|
-      next if BpmIntegration::ProcessDefinition.where(process_identifier:process.id).first
+      next if BpmIntegration::ProcessDefinitionVersion.where(process_identifier:process.id).first
       begin
         Delayed::Worker.logger.info "#{self.class} - Sincronizando process_definition " + process.id.to_s
         save_process_definition(process)
@@ -48,17 +48,13 @@ class SyncProcessDefinitionsJob < ActiveJob::Base
   end
 
   def preset_previous_version_configurations(process)
-    last_version = BpmIntegration::ProcessDefinition.where(key:process.key).where.not(id:process.id).order('version desc').first
+    last_version = process.process_definition.versions.where.not(process_identifier: process.id)
+                                                  .order('version desc').first
     return if last_version.blank?
 
     preset_form_field_definitions(process, last_version)
-    preset_process_tracker(process, last_version)
     preset_process_constants(process, last_version)
     preset_process_end_events(process, last_version)
-  end
-
-  def preset_process_tracker(process, last_version)
-    process.tracker_process_definition = last_version.tracker_process_definition
   end
 
   def preset_form_field_definitions(process, last_version)
@@ -95,23 +91,20 @@ class SyncProcessDefinitionsJob < ActiveJob::Base
     process_constants = []
     process_end_events = []
 
-    data_objects.map do |data_object|
+    data_objects.each do |data_object|
       if data_object['value'] == "end_event"
-        process_end_events << BpmIntegration::ProcessEndEvent.new(
+        process.end_events.build(
           identifier: data_object['name'],
           name: data_object['id']
         )
       else
-        process_constants << BpmIntegration::ProcessConstant.new(
-                                    identifier: data_object['name'],
-                                    name: data_object['id'],
-                                    constant_type: data_object['value']
-                                  )
+        process.constants.build(
+          identifier: data_object['name'],
+          name: data_object['id'],
+          constant_type: data_object['value']
+        )
       end
     end
-
-    process.constants = process_constants
-    process.end_events = process_end_events
   end
 
   def synchronize_form_fields(process)
@@ -121,7 +114,7 @@ class SyncProcessDefinitionsJob < ActiveJob::Base
     form_properties.each do |form_item|
       next unless form_item["readable"]
 
-      field_definition = find_or_create_form_field_definition(process, form_item)
+      field_definition = find_or_build_form_field_definition(process, form_item)
 
       form_field = build_form_field_from_hash(form_item)
 
@@ -147,7 +140,7 @@ class SyncProcessDefinitionsJob < ActiveJob::Base
       task_form_properties.each do |form_item|
         next unless form_item["readable"]
 
-        field_definition = find_or_create_form_field_definition(process, form_item)
+        field_definition = find_or_build_form_field_definition(process, form_item)
 
         form_field = build_form_field_from_hash(form_item)
         form_field.form_field_definition = field_definition
@@ -165,32 +158,37 @@ class SyncProcessDefinitionsJob < ActiveJob::Base
   private
 
   def build_process_definition(bpm_process_definition)
-    process = BpmIntegration::ProcessDefinition.new
-    process.process_identifier = bpm_process_definition.id
-    process.description = bpm_process_definition.description
-    process.name = bpm_process_definition.name
-    process.key = bpm_process_definition.key
-    process.version = bpm_process_definition.version
-
-    process
+    process_definition = BpmIntegration::ProcessDefinition.where(key: bpm_process_definition.key).first_or_create do |p|
+      p.name = bpm_process_definition.name
+    end
+    process_defintion_version = process_definition.versions.build(
+      process_identifier: bpm_process_definition.id,
+      description: bpm_process_definition.description,
+      name: bpm_process_definition.name,
+      version: bpm_process_definition.version
+    )
+    process_defintion_version
   end
 
-  def find_or_create_form_field_definition(process, form_item_hash)
-    BpmIntegration::FormFieldDefinition.process_field(process.process_identifier, form_item_hash["id"])
-          .first_or_create do |ffd|
-      ffd.process_definition = process
-      ffd.name = form_item_hash["name"]
-      ffd.field_type = form_item_hash["type"]["name"] if form_item_hash["type"]
+  def find_or_build_form_field_definition(process, form_item_hash)
+    ffd = process.form_field_definitions.detect { |ffd| ffd.field_id == form_item_hash["id"] }
+    if ffd.blank?
+      ffd = process.form_field_definitions.build(
+        field_id: form_item_hash["id"],
+        name: form_item_hash["name"],
+        field_type: form_item_hash["type"] && form_item_hash["type"]["name"]
+      )
     end
+    ffd
   end
 
   def build_form_field_from_hash(form_item_hash)
-    form_field = BpmIntegration::FormField.new
-    form_field.readable = form_item_hash["readable"]
-    form_field.writable = form_item_hash["writable"]
-    form_field.required = form_item_hash["required"]
-    form_field.date_pattern = form_item_hash["datePattern"]
-
+    form_field = BpmIntegration::FormField.new(
+      readable: form_item_hash["readable"],
+      writable: form_item_hash["writable"],
+      required: form_item_hash["required"],
+      date_pattern: form_item_hash["datePattern"]
+    )
     form_field
   end
 

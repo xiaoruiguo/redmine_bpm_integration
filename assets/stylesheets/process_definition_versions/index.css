@@ -1,0 +1,41 @@
+label,  input {
+  display: block;
+  float: left;
+}
+
+label {
+  text-align: right;
+  width: 50px;
+  padding-right: 20px;
+  padding-bottom: 10px;
+}
+
+fieldset {
+  border: solid 1px #000;
+}
+
+br {
+  clear: left;
+}
+
+#diagram_loader {
+  display: none;
+  /*quando padronizarmos a forma de fazer o diagrama do bpm, ajustar esses valores*/
+  margin-right: 30px;
+  margin-bottom: 100px;
+}
+
+a.popup_bpm_diagram:focus {
+    outline: none;
+}
+
+h2.title_process_diagram{
+    font-size: 20px;
+    color: #000;
+    text-align: center;
+    width: 100%;
+}
+
+.ui-button-icon-only .ui-button-text {
+     padding: 0px; 
+}

@@ -12,17 +12,17 @@ class StartProcessJob < ActiveJob::Base
   def start_bpm_process(issue_id)
     issue = Issue.find(issue_id)
     begin
-      process_definition = issue.tracker.process_definition
-      form_data = form_values(process_definition.form_fields, issue)
-      constants = process_constants(process_definition.constants)
+      process_definition_version = issue.tracker.process_active_version
+      form_data = form_values(process_definition_version.form_fields, issue)
+      constants = process_constants(process_definition_version.constants)
       variables = form_data.merge(constants)
       process = BpmProcessInstanceService.start_process(
-        process_definition.key, issue.id, variables
+        process_definition_version.process_definition.key, issue.id, variables
       )
       issue.reload
       issue.process_instance ||= BpmIntegration::IssueProcessInstance.new
       issue.process_instance.process_instance_id = process.id
-      issue.process_instance.process_definition = process_definition
+      issue.process_instance.process_definition_version = process_definition_version
       issue.process_instance.completed = process.completed
       issue.process_instance.save!(validate:false)
       issue.status_id = process.completed ?

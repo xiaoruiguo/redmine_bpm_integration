@@ -7,22 +7,22 @@ module BpmIntegration
 
         base.class_eval do
 
-          has_one :tracker_process_definition, class_name: 'BpmIntegration::TrackerProcessDefinition'
-          # has_many :tracker_process_definition, class_name: 'BpmIntegration::TrackerProcessDefinition', :dependent => :destroy
-
-          scope :bpm_processes, -> { joins(:tracker_process_definition) }
+          has_one :tracker_process_definition, { class_name: 'BpmIntegration::TrackerProcessDefinition',
+                                                  dependent: :destroy }
+          has_one :process_definition, { class_name: 'BpmIntegration::ProcessDefinition',
+                                          through: :tracker_process_definition }
 
         end
       end
 
       module InstanceMethods
 
-        def process_definition
-          self.tracker_process_definition.process_definitions.order(:version).last
+        def is_bpm_process?
+          self.process_definition && self.process_definition.is_active?
         end
 
-        def is_bpm_process?
-          !self.tracker_process_definition.nil?
+        def process_active_version
+          self.is_bpm_process? && self.process_definition.active_version
         end
 
       end

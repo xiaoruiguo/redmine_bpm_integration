@@ -65,8 +65,10 @@ class SyncProcessInstancesJob < ActiveJob::Base
     if !end_events.blank?
       end_events.each do |end_event|
         if end_event.identifier == end_event_id
+          old_status = issue.status
           issue.status_id = end_event.issue_status_id
           issue.save!(validate:false)
+          add_end_event_note(end_event, issue, User.current, old_status)
           return nil
         end
       end
@@ -74,6 +76,14 @@ class SyncProcessInstancesJob < ActiveJob::Base
 
     issue.status_id = Setting.plugin_bpm_integration[:closed_status].to_i
     issue.save!(validate:false)
+  end
+
+  def add_end_event_note(end_event, issue, user, old_status)
+    new_status = issue.status
+    new_journal = Journal.new(:journalized => issue, :user => user, :notes => end_event.notes)
+    new_journal.details << JournalDetail.new(:property => 'attr', :prop_key => 'status_id',:old_value => old_status, :value => new_status)
+    issue.journals << new_journal
+    issue.save!(validate: false)
   end
 
   def handle_error(issue, msg, e = nil)

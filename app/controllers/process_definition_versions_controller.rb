@@ -22,7 +22,7 @@ class ProcessDefinitionVersionsController < BpmController
     params.require(:bpm_integration_process_definition_version)
           .permit(:active, :name, form_field_definitions_attributes: [:id, :custom_field_id],
           constants_attributes: [:id, :value],
-          end_events_attributes: [:id, :issue_status_id])
+          end_events_attributes: [:id, :issue_status_id, :notes])
   end
 
   def create

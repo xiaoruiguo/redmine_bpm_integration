@@ -20,9 +20,14 @@
         <% end %>
         <h4> <%= t(:title_process_end_events) %> </h4>
           <%= f.fields_for :end_events do |f_end_event| %>
+          <h3> <%= f_end_event.object.name %> </h3>
             <p>
-              <%= f_end_event.label :issue_status, "#{f_end_event.object.name} <span class='required'> *</span>".html_safe, class: 'bpm-form-label' %>
+              <%= f_end_event.label :issue_status, "Status <span class='required'> *</span>".html_safe, class: 'bpm-form-label' %>
               <%= f_end_event.collection_select(:issue_status_id, IssueStatus.all, :id, :name, include_blank: true) %>
+            </p>
+            <p>
+              <%= f_end_event.label :notes, "Mensagem de conclusão".html_safe, class: 'bpm-form-label' %>
+              <%= f_end_event.text_area(:notes, size: "20x4", class: 'bpm-form-notes') %>
             </p>
         <% end %>
       <% end %>

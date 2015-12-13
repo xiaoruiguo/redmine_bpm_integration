@@ -82,6 +82,7 @@ class SyncProcessDefinitionsJob < ActiveJob::Base
       last_end_event = last_version.end_events.where(identifier:end_event.identifier).first
       next if last_end_event.blank? || last_end_event.issue_status.blank?
       end_event.issue_status_id = last_end_event.issue_status_id
+      end_event.notes = last_end_event.notes
     end
   end
 

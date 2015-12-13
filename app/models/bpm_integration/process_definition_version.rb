@@ -2,7 +2,7 @@
 class BpmIntegration::ProcessDefinitionVersion < BpmIntegrationBaseModel
   self.table_name = 'bpmint_process_def_versions'
 
-  belongs_to :process_definition
+  belongs_to :process_definition, touch: true
   has_many :task_definitions
   has_many :form_fields, class_name: 'FormField', as: :form_able
   has_many :form_field_definitions, autosave: true, dependent: :destroy

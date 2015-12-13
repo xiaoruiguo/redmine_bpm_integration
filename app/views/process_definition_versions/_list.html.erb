@@ -7,8 +7,9 @@
     <tr>
       <th><%=t(:process_name)%></th>
       <th><%=t(:process_description)%></th>
-      <th><%=t(:label_tracker)%></th>
       <th><%=t(:process_version)%></th>
+      <th><%=t(:field_created_on)%></th>
+      <th><%=t(:field_updated_on)%></th>
       <th><%=t(:active)%></th>
       <th></th>
     </tr>
@@ -18,8 +19,9 @@
         <td><%= link_to process.name, "javascript:void(0);", class: 'popup_bpm_diagram',
             'data-url' => bpm_integration_process_definition_version_path(process, format: "png")  %></td>
         <td><%= process.description %></td>
-        <td><%= process.try(&:process_definition).try(&:tracker).try(&:name) %></td>
         <td><%= process.version %></td>
+        <td><%= format_date(process.created_at) %></td>
+        <td><%= l(:label_updated_time, time_tag(process.updated_at)).html_safe %></td>
         <td><%= checked_image process.active? %></td>
         <td><%= link_to t(:button_edit), edit_bpm_integration_process_definition_version_path(process) %></td>
       </tr>

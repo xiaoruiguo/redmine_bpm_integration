@@ -19,6 +19,8 @@
       <th><%=t(:process_description)%></th>
       <th><%=t(:label_tracker)%></th>
       <th><%=t(:process_version)%></th>
+      <th><%=t(:field_created_on)%></th>
+      <th><%=t(:field_updated_on)%></th>
       <th></th>
     </tr>
 
@@ -30,6 +32,8 @@
         <td><%= process.active_version.try(&:description) %></td>
         <td><%= process.try(&:tracker).try(&:name) %></td>
         <td><%= process.active_version.try(&:version) %></td>
+        <td><%= format_date(process.created_at) %></td>
+        <td><%= l(:label_updated_time, time_tag(process.updated_at)).html_safe %></td>
         <td><%= link_to t(:button_edit), edit_bpm_integration_process_definition_path(process) %></td>
       </tr>
       <div id = "diagram_loader">

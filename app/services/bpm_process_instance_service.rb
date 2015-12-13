@@ -33,7 +33,7 @@ class BpmProcessInstanceService < ActivitiBpmService
     id = process_instance.process_instance_id.to_s
     if (process_instance.completed == true)
       get(
-        '/repository/process-definitions/' + process_instance.process_definition.process_identifier + '/image',
+        '/repository/process-definitions/' + process_instance.process_definition_version.process_identifier + '/image',
         basic_auth: @@auth
       ).body
 

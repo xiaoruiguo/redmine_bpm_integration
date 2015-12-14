@@ -18,7 +18,7 @@ class BpmIntegration::ProcessDefinitionVersion < BpmIntegrationBaseModel
   def active= (is_active)
     if is_active == "1" || is_active == true
       av = process_definition.active_version
-      if av
+      if av && av != self
         av.active = false
         av.save
       end

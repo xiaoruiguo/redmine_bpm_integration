@@ -14,10 +14,10 @@ class SyncBpmTasksJob < ActiveJob::Base
     read_human_tasks(process_instance_id).each do |task|
       begin
         next if BpmIntegration::HumanTaskIssue.where(human_task_id:task.id).first
-        issue = build_issue_from_task(task)
-        next if issue.nil?
         task_definition = BpmIntegration::TaskDefinition.by_task_instance(
                                                             task.taskDefinitionKey, task.processDefinitionId).first
+        issue = build_issue_from_task(task, task_definition)
+        next if issue.nil?
 
         issue.human_task_issue = build_human_task_issue(task, task_definition)
 
@@ -60,7 +60,7 @@ class SyncBpmTasksJob < ActiveJob::Base
     end
   end
 
-  def build_issue_from_task(task)
+  def build_issue_from_task(task, task_definition)
     parent_id = Issue.by_process_instance(task.processInstanceId).pluck(:id).first
     if parent_id.nil?
       Delayed::Worker.logger.error "Não existe nenhuma issue para este processo"
@@ -68,7 +68,7 @@ class SyncBpmTasksJob < ActiveJob::Base
     end
     parent = Issue.find(parent_id)
     issue = Issue.new
-    issue.status_id = Setting.plugin_bpm_integration[:new_status].to_i
+    issue.status_id = task_definition.issue_status_id || Setting.plugin_bpm_integration[:new_status].to_i
     issue.subject = (task.name + " - " + parent.subject).truncate(255)
     issue.description = parent.description
     issue.priority_id = IssuePriority.default.id

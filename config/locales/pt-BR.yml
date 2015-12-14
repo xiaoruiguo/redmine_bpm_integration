@@ -25,6 +25,7 @@ pt-BR:
   title_process_definition_custom_fields: 'Campos personalizados utilizados pelo processo'
   title_process_constants: 'Variáveis do processo'
   title_process_end_events: 'Estados de conclusão do processo'
+  title_process_definition_task_definitions: 'Tarefas do processo'
 
   #Tasks
   bpm_tasks: 'Tarefas BPM'

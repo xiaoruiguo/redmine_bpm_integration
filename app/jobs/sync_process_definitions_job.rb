@@ -52,9 +52,18 @@ class SyncProcessDefinitionsJob < ActiveJob::Base
                                                   .order('version desc').first
     return if last_version.blank?
 
+    preset_task_definitions(process, last_version)
     preset_form_field_definitions(process, last_version)
     preset_process_constants(process, last_version)
     preset_process_end_events(process, last_version)
+  end
+
+  def preset_task_definitions(process, last_version)
+    process.task_definitions.each do |task|
+      last_task = last_version.task_definitions.where(key: task.key).first
+      next if last_task.blank?
+      task.issue_status_id = last_task.issue_status_id
+    end
   end
 
   def preset_form_field_definitions(process, last_version)

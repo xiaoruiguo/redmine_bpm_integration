@@ -35,6 +35,18 @@
   </div>
 </div>
 
+<div class="splitcontentright">
+  <div class="box tabular">
+    <h4> <%= t(:title_process_definition_task_definitions) %> </h4>
+        <%= f.fields_for :task_definitions do |td_fields| %>
+        <p>
+          <%= td_fields.label :issue_status_id, td_fields.object.key.try(&:humanize), class: 'bpm-form-label' %>
+          <%= td_fields.collection_select :issue_status_id, IssueStatus.all, :id, :name, include_blank: true %>
+        </p>
+        <% end %>
+  </div>
+</div>
+
 <%if !@process_definition_version.form_field_definitions.blank? %>
   <div class="splitcontentright">
     <div class="box tabular">

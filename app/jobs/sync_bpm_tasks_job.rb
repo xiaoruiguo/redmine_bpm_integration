@@ -77,6 +77,9 @@ class SyncBpmTasksJob < ActiveJob::Base
     issue.parent_id = parent.id
     issue.assigned_to_id = get_assignee_id(task.assignee)
     issue.project_id = Project.where(identifier: task.formKey).pluck(:id).first || issue.parent.project_id
+
+    issue.add_watcher(parent.author)
+
     issue
   end
 

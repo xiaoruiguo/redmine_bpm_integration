@@ -71,7 +71,7 @@ class BpmTaskService < ActivitiBpmService
       owner: issue.author_id,
       priority: issue.priority_id,
       category: issue.category_id,
-      description: issue.description,
+      description: issue.description
     }.to_json
   end
 
@@ -92,8 +92,15 @@ class BpmTaskService < ActivitiBpmService
       { ff.field_id => field_value }
     end
     hash_fields = hash_fields.reduce({},&:merge)
-    hash_fields["status_id"] = issue.status_id
+    hash_fields.merge!(default_fields_form_values(issue))
     hash_fields
+  end
+
+  def self.default_fields_form_values(issue)
+    {
+      "status_id" => issue.status_id,
+      "user_id" => User.current.try(&:id)
+    }
   end
 
 end

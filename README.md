@@ -68,3 +68,9 @@ Synchronization Jobs
     - On closing issue (specific)
 
   To identify where they are being called, search for "#JOB"
+
+
+Turn on/off jobs to sync processes and tasks from Activiti
+
+  - ON:   > run_jobs.sh {environment}
+  - OFF:  > stop_sync_jobs.sh {db.user} {db.password} {db} {environment}

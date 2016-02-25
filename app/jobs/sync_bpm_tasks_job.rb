@@ -45,7 +45,7 @@ class SyncBpmTasksJob < ActiveJob::Base
     if job.arguments.empty?
       #JOB - Reagendamento
       self.class.set(wait: SyncJobsPeriod.bpm_task_period).perform_later
-      Delayed::Worker.logger.info "#{self.class} - Sincronização de tarefas agendada"
+      Delayed::Worker.logger.info "#{self.class} - Sincronização de bpm_tasks agendada"
     end
   end
 

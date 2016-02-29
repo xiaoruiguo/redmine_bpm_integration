@@ -23,7 +23,7 @@
           <h3> <%= f_end_event.object.name %> </h3>
             <p>
               <%= f_end_event.label :issue_status, "Status <span class='required'> *</span>".html_safe, class: 'bpm-form-label' %>
-              <%= f_end_event.collection_select(:issue_status_id, IssueStatus.all, :id, :name, include_blank: true) %>
+              <%= f_end_event.collection_select(:issue_status_id, IssueStatus.all.sort{|a,b| a.name <=> b.name}, :id, :name, include_blank: true) %>
             </p>
             <p>
               <%= f_end_event.label :notes, "Mensagem de conclusão".html_safe, class: 'bpm-form-label' %>
@@ -37,11 +37,11 @@
 
 <div class="splitcontentright">
   <div class="box tabular">
-    <h4> <%= t(:title_process_definition_task_definitions) %> </h4>
+    <h4> <%= t(:title_initial_status_user_tasks) %> </h4>
         <%= f.fields_for :task_definitions do |td_fields| %>
         <p>
           <%= td_fields.label :issue_status_id, td_fields.object.key.try(&:humanize), class: 'bpm-form-label' %>
-          <%= td_fields.collection_select :issue_status_id, IssueStatus.all, :id, :name, include_blank: true %>
+          <%= td_fields.collection_select :issue_status_id, IssueStatus.all.sort{|a,b| a.name <=> b.name}, :id, :name, include_blank: true %>
         </p>
         <% end %>
   </div>
@@ -54,7 +54,7 @@
           <%= f.fields_for :form_field_definitions do |ffd_fields| %>
           <p>
             <%= ffd_fields.label :custom_field_id, "#{ffd_fields.object.name} <span class='required'> *</span>".html_safe, class: 'bpm-form-label' %>
-            <%= ffd_fields.collection_select :custom_field_id, IssueCustomField.all, :id, :name, include_blank: true %>
+            <%= ffd_fields.collection_select :custom_field_id, IssueCustomField.all.sort{|a,b| a.name <=> b.name}, :id, :name, include_blank: true %>
           </p>
           <% end %>
     </div>

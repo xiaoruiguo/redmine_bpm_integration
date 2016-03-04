@@ -1,16 +1,18 @@
- <%= stylesheet_link_tag "process_instances/process_instance_image_link", plugin: "bpm_integration" %>
- <%= javascript_include_tag "process_instances/process_instance_image_link", plugin: "bpm_integration" %>
+<% if issue.process_instance %>
+  <%= stylesheet_link_tag "process_instances/process_instance_image_link", plugin: "bpm_integration" %>
+  <%= javascript_include_tag "process_instances/process_instance_image_link", plugin: "bpm_integration" %>
 
-<%= button_tag(l(:view_process_instance), :class => "popup_bpm_diagram") if issue.process_instance %>
-<div id="diagram_loader">
-	<h2 class='title_process_diagram'>
-		<%= 
-		begin
-			!issue.is_human_task? && issue.process_instance.completed ? l(:process_finished_image) : l(:process_in_progress_image) 
-		rescue => exception
-		end
-		%> 
+  <%= button_tag(l(:view_process_instance), :class => "popup_bpm_diagram") %>
+  <div id="diagram_loader">
+  	<h2 class='title_process_diagram'>
+  		<%=
+  		begin
+  			!issue.is_human_task? && issue.process_instance.completed ? l(:process_finished_image) : l(:process_in_progress_image)
+  		rescue => exception
+  		end
+  		%>
 
-	</h2>
-	<%= image_tag(process_instance_path(issue.id, format: "png"), :class => 'diagram_bpm') %>
-</div>
+  	</h2>
+  	<%= image_tag(process_instance_path(issue.id, format: "png"), :class => 'diagram_bpm') %>
+  </div>
+<% end %>

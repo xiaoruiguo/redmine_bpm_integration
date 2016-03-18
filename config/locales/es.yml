@@ -1,0 +1,41 @@
+es:
+
+  bpm_integration:
+    settings:
+      bpms_url: "URL"
+      bpms_user: "Usuario"
+      bpms_pass: "Contraseña"
+      bpms_closed_status: "Status Terminado"
+      bpms_doing_status: "Status en processo"
+      bpms_new_status: "Status Nuevo"
+      bpms_error_status: "Status Error"
+
+  #Processos
+  process_name: 'Nombre'
+  process_description: 'descripción'
+  process_version: 'Versión'
+  new_process: 'Nuevo proceso'
+  bpm_processes: 'Procesos BPM'
+  start_process: 'Iniciar'
+  view_process_instance: 'Visualizar progreso del proceso'
+  msg_process_started: 'El proceso se ha iniciado con éxito!'
+  msg_process_uploaded: 'La definición de proceso fue cargada con éxito!'
+  msg_process_upload_error: 'Ocurrió producido un error durante la carga de la definición de proceso.'
+  title_process_definition_tracker: 'Tipo de Tarea que representa el proceso'
+  title_process_definition_custom_fields: 'Campos personalizados utilizados en el proceso'
+  title_process_constants: 'Variables del proceso'
+  title_process_end_events: 'Estados de conclusión del proceso'
+  title_initial_status_user_tasks: 'Estado inicial de las tareas del proceso'
+
+  #Tasks
+  bpm_tasks: 'Tareas BPM'
+
+  #Erros
+  error_process_instance_job: 'Ocurrió un error al intentar sincronizar con el proceso del BPMs'
+  error_process_start: 'Ocurrió un error al iniciar un nuevo proceso.'
+  error_bpm_tasks_job: 'Ocurrió un error al intentar sincronizar la lista de tareas con el BPMs.'
+  msg_issue_closed_error: 'Ocurrió un error al intentar concluir la petición.'
+
+  #Diagram Image
+  process_finished_image: 'Proceso Concluido'
+  process_in_progress_image: 'Progreso del Proceso'

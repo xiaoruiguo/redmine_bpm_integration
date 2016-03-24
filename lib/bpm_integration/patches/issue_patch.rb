@@ -63,6 +63,9 @@ module BpmIntegration
 
         def read_only_attribute_names_with_bpm_form_fields(user = nil)
           cf_names = read_only_attribute_names_without_bpm_form_fields(user)
+
+          return cf_names if (user || User.current).admin?
+
           cf_names = (cf_names | read_only_bpm_form_fields_names(bpm_form_fields, user)) unless bpm_form_fields.blank?
           cf_names
         end

@@ -54,7 +54,9 @@
           <%= f.fields_for :form_field_definitions do |ffd_fields| %>
           <p>
             <%= ffd_fields.label :custom_field_id, "#{ffd_fields.object.name} <span class='required'> *</span>".html_safe, class: 'bpm-form-label' %>
-            <%= ffd_fields.collection_select :custom_field_id, IssueCustomField.all.sort{|a,b| a.name <=> b.name}, :id, :name, include_blank: true %>
+            <%= ffd_fields.collection_select :custom_field_id,
+                                      @process_definition_version.process_definition.tracker.try(&:custom_fields) || [],
+                                      :id, :name, include_blank: true %>
           </p>
           <% end %>
     </div>

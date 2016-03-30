@@ -53,8 +53,9 @@ class CreateProcessDefinitionVersionAndRefactorDatabaseModel < ActiveRecord::Mig
     add_foreign_key :bpmint_issue_process_instances, :bpmint_process_def_versions, column: :process_definition_version_id
 
     change_table :bpmint_process_end_events do |t|
+      t.rename_index('index_bpmint_process_end_events_on_process_definition_id',
+                  'index_bpmint_process_end_events_on_proc_def_version_id')
       t.rename(:process_definition_id, :process_definition_version_id)
     end
-
   end
 end

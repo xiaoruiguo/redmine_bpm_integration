@@ -60,7 +60,7 @@ class StartProcessJob < ActiveJob::Base
       end
       { ff.field_id => field_value }
     end
-    hash_fields.reduce(&:merge)
+    hash_fields.reduce(&:merge) || {}
   end
 
   def handle_error(issue, e)

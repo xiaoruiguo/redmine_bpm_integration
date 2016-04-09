@@ -2,6 +2,6 @@
 
 <%= form_for @process_definition, url: {action: "update"} do |f| %>
 <%= render :partial => 'form', :locals => { :f => f } %>
-<%= render :partial => 'process_definition_versions/list', locals: { process_definition_versions: @process_definition.versions } %>
+<%= render :partial => 'process_definition_versions/list', locals: { process_definition_versions: @process_definition.versions.order('version desc') } %>
 <%= submit_tag t(:button_save) %>
 <% end %>

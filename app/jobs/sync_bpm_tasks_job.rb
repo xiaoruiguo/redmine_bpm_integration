@@ -73,7 +73,7 @@ class SyncBpmTasksJob < ActiveJob::Base
     issue.description = parent.description
     issue.priority_id = IssuePriority.default.id
     issue.author_id = Setting.plugin_bpm_integration[:bpm_user].to_i
-    issue.tracker = get_tracker(task.processDefinitionId)
+    issue.tracker = get_tracker(task_definition)
     issue.parent_id = parent.id
     issue.assigned_to_id = get_assignee_id(task.assignee)
     issue.project_id = Project.where(identifier: task.formKey).pluck(:id).first || issue.parent.project_id
@@ -83,9 +83,8 @@ class SyncBpmTasksJob < ActiveJob::Base
     issue
   end
 
-  def get_tracker(process_id)
-    process_definition_version = BpmIntegration::ProcessDefinitionVersion.where(process_identifier: process_id).first
-    process_definition_version.process_definition.tracker
+  def get_tracker(task_definition)
+    task_definition.tracker || task_definition.process_definition_version.process_definition.tracker
   end
 
   def get_assignee_id(task_assignee)

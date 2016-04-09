@@ -1,6 +1,13 @@
 <%= title [l(:bpm_processes), bpm_integration_process_definitions_path], @process_definition_version.name %>
 
 <%= form_for @process_definition_version, url: {action: "update"} do |f| %>
-<%= render :partial => 'form', :locals => { :f => f } %>
-<%= submit_tag t(:button_save) %>
+  <%= render :partial => 'form', :locals => { :f => f } %>
+  <%= submit_tag t(:button_save) %>
+<% end %>
+
+<%= yield :after_form %>
+
+<% content_for :header_tags do %>
+ <%= stylesheet_link_tag "process_definition_versions/index", plugin: "bpm_integration" %>
+ <%= javascript_include_tag "process_definition_versions/index", plugin: "bpm_integration" %>
 <% end %>

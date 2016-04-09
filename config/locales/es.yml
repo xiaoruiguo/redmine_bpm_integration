@@ -25,7 +25,8 @@ es:
   title_process_definition_custom_fields: 'Campos personalizados utilizados en el proceso'
   title_process_constants: 'Variables del proceso'
   title_process_end_events: 'Estados de conclusión del proceso'
-  title_initial_status_user_tasks: 'Estado inicial de las tareas del proceso'
+  title_user_task_initial_status: 'Estado inicial'
+  title_process_tasks: 'Tareas del processo'
 
   #Tasks
   bpm_tasks: 'Tareas BPM'

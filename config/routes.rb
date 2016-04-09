@@ -5,4 +5,6 @@ resources :process_definitions, except: [:destroy], as: :bpm_integration_process
 resources :process_definition_versions, except: [:destroy], as: :bpm_integration_process_definition_versions
 resources :process_instances, only: [:show]
 
+resources :bpm_tracker, only: [:create]
+
 match 'bpm_task_instances/sync', controller: 'bpm_task_instances', action: 'sync', via: 'get'

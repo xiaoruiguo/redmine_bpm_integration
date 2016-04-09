@@ -2,6 +2,7 @@ class BpmIntegration::TaskDefinition < BpmIntegrationBaseModel
 
   belongs_to :process_definition_version, touch: true
   belongs_to :issue_status
+  belongs_to :tracker
   has_many :form_fields, class_name: 'FormField', as: :form_able
 
   scope :by_task_instance, -> (task_key, process_id) { joins(:process_definition_version)

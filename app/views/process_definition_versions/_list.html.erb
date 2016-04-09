@@ -1,5 +1,7 @@
+<% content_for :header_tags do %>
  <%= stylesheet_link_tag "process_definition_versions/index", plugin: "bpm_integration" %>
  <%= javascript_include_tag "process_definition_versions/index", plugin: "bpm_integration" %>
+<% end %>
 
 <% unless process_definition_versions.blank? %>
 <div class="autoscroll">

@@ -37,5 +37,9 @@ h2.title_process_diagram{
 }
 
 .ui-button-icon-only .ui-button-text {
-     padding: 0px; 
+     padding: 0px;
+}
+
+.edit_bpm_integration_process_definition_version i {
+  cursor: pointer;
 }

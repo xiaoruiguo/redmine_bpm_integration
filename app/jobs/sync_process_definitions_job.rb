@@ -63,6 +63,7 @@ class SyncProcessDefinitionsJob < ActiveJob::Base
       last_task = last_version.task_definitions.where(key: task.key).first
       next if last_task.blank?
       task.issue_status_id = last_task.issue_status_id
+      task.tracker_id      = last_task.tracker_id
     end
   end
 

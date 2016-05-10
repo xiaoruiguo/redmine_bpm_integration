@@ -43,3 +43,7 @@ h2.title_process_diagram{
 .edit_bpm_integration_process_definition_version i {
   cursor: pointer;
 }
+
+.edit_bpm_integration_process_definition_version .tabular select {
+  width: 85%;
+}

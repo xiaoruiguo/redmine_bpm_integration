@@ -19,7 +19,7 @@ module BpmIntegration
                                             .where(bpmint_issue_process_instances:{process_instance_id: process_instance_id})
                                           }
 
-          after_commit :start_process_instance, if: 'self.tracker.is_bpm_process? and !self.is_human_task?', on: :create
+          after_commit :start_process_instance, if: 'self.tracker.is_bpm_process? && self.parent.try(:tracker_id) != tracker_id', on: :create
           before_save :close_human_task, if: 'self.status.is_closed and self.is_human_task?'
 
           alias_method_chain :available_custom_fields, :bpm_form_fields

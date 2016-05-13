@@ -33,9 +33,11 @@ class CreateProcessDefinitionVersionAndRefactorDatabaseModel < ActiveRecord::Mig
       t.rename(:process_definition_id, :process_definition_version_id)
     end
 
+    remove_index :bpmint_process_constants, :process_definition_id
     change_table :bpmint_process_constants do |t|
       t.rename(:process_definition_id, :process_definition_version_id)
     end
+    add_index :bpmint_process_constants, :process_definition_version_id, name: :index_bpmint_process_constants_on_pdv_id
 
     change_table :bpmint_task_definitions do |t|
       t.rename(:process_definition_id, :process_definition_version_id)

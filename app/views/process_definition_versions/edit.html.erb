@@ -1,6 +1,6 @@
 <%= title [l(:bpm_processes), bpm_integration_process_definitions_path], @process_definition_version.name %>
 
-<%= form_for @process_definition_version, url: {action: "update"} do |f| %>
+<%= form_for @process_definition_version, url: {action: "update", class: 'bpms'} do |f| %>
   <%= render :partial => 'form', :locals => { :f => f } %>
   <%= submit_tag t(:button_save) %>
 <% end %>

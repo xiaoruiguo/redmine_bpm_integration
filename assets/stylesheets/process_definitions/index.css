@@ -1,9 +1,9 @@
-label,  input {
+.bpms label,  .bpms input {
   display: block;
   float: left;
 }
 
-label {
+.bpms label {
   text-align: right;
   width: 50px;
   padding-right: 20px;
@@ -37,5 +37,5 @@ h2.title_process_diagram{
 }
 
 .ui-button-icon-only .ui-button-text {
-     padding: 0px; 
+     padding: 0px;
 }

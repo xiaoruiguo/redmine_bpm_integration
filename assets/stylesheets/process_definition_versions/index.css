@@ -1,9 +1,9 @@
-label,  input {
+.bpms label,  .bpms input {
   display: block;
   float: left;
 }
 
-label {
+.bpms label {
   text-align: right;
   width: 50px;
   padding-right: 20px;

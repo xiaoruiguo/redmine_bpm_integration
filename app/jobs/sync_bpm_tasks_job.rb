@@ -102,12 +102,17 @@ class SyncBpmTasksJob < ActiveJob::Base
   def custom_values_from_task_form_data(task, task_definition)
     custom_field_values = []
     form_fields_data = BpmTaskService.form_data(task.id)['formProperties']
+
     task_definition.form_fields.select { |ff| ff.readable }.each do |ff|
       ff_data = form_fields_data.select { |ffd| ffd["id"] == ff.field_id }.first
-      custom_field_values << { id: ff.custom_field.id, value: (ff_data["value"] || '') }
+      custom_field_values << { id: ff.custom_field.id, value: convert_string_value_to_ruby_object(ff_data["value"]) }
     end
 
     custom_field_values
+  end
+
+  def convert_string_value_to_ruby_object(value)
+    (JSON::parse(value) rescue value) || '' # Json parse to parse array values rescue to avoid exception
   end
 
 end

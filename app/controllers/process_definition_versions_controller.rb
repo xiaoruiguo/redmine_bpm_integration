@@ -23,7 +23,7 @@ class ProcessDefinitionVersionsController < BpmController
           .permit(:active, :name, form_field_definitions_attributes: [:id, :custom_field_id],
           constants_attributes: [:id, :value],
           end_events_attributes: [:id, :issue_status_id, :notes],
-          task_definitions_attributes: [:id, :issue_status_id, :tracker_id])
+          task_definitions_attributes: [:id, :issue_status_id, :tracker_id, :add_author_as_watcher])
   end
 
   def create

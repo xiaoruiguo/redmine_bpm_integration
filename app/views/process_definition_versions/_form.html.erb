@@ -42,6 +42,10 @@
     <%= f.fields_for :task_definitions do |td_fields| %>
       <h4> <%=  td_fields.object.key.try(&:humanize) %></h4>
       <p>
+        <%= td_fields.label :add_author_as_watcher, t(:title_task_definitions_add_author_as_watcher), class: 'bpm-form-label' %>
+        <%= td_fields.check_box :add_author_as_watcher %>
+      </p>
+      <p>
         <%= td_fields.label :issue_status_id, t(:title_user_task_initial_status), class: 'bpm-form-label' %>
         <%= td_fields.collection_select :issue_status_id, IssueStatus.all.sort{|a,b| a.name <=> b.name}, :id, :name, include_blank: true %>
       </p>

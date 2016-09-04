@@ -21,6 +21,7 @@ pt-BR:
   msg_process_started: 'O processo foi iniciado com sucesso!'
   msg_process_uploaded: 'A definição de processo foi carregada com sucesso!'
   msg_process_upload_error: 'Ocorreu um erro ao carregar a definição de processo.'
+  title_task_definitions_add_author_as_watcher: 'Adicionar autor do processo como observador'
   title_process_definition_tracker: 'Tipo de Tarefa que representa o processo'
   title_process_definition_custom_fields: 'Campos personalizados utilizados pelo processo'
   title_process_constants: 'Variáveis do processo'

@@ -126,3 +126,69 @@
     </div>
   </div>
 <%end%>
+
+
+<style>
+  .fa.fa-plus-circle {
+    float: right;
+    padding-right: 1em;
+    padding-top: 0.35em;
+  }
+</style>
+
+<%= javascript_include_tag('chosen.jquery.min.js', plugin: 'bpm_integration') %>
+<%= javascript_include_tag('ajax-chosen.min.js', plugin: 'bpm_integration') %>
+<script type="text/javascript">
+
+  var fix_chosen_css = function(chosen_element) {
+    var parent = $(chosen_element).siblings('.chosen-container');
+
+    if (parent.parent('td').length == 0) {
+      parent.css('position', 'absolute');
+      parent.css('display', 'block');
+      parent.parent().css('height', (parent.height()+10) + 'px');
+    } else {
+      parent.css('width', '100%');
+    }
+    parent.css('min-width', '236px');
+
+    var lastHeight = parent.height();
+    function checkForHeightChanges() {
+      if (parent.height() != lastHeight) {
+        parent.parent().css('height', (parent.height()+10) + 'px');
+        lastHeight = parent.height();
+      } else {
+        setTimeout(checkForHeightChanges, 500);
+      }
+    };
+    setTimeout(checkForHeightChanges, 500);
+  }
+
+  var make_chosen = function(elem) {
+    $(elem).chosen({inherit_select_classes: true, allow_single_deselect: true}).change(function(elem) {
+      var container = $(this).siblings('.chosen-container').parent();
+      if (container.length >= 0) {
+        container.css('height', $(this).siblings('.chosen-container').height());
+      }
+    });
+    fix_chosen_css(elem)
+  }
+
+  var update_chosen = function(chosen) {
+    input = $(chosen).parent().find('div.chosen-drop input[type=text]');
+    value = $(input).val();
+    $(chosen).trigger('chosen:updated');
+    $(input).val(value);
+  }
+
+  var make_select_elements_chosen = function (){
+    $('select').not("#relation_relation_type")
+        .not('.description')
+        .not('#project_quick_jump_box').each(function(index, elem){
+      make_chosen(elem);
+    });
+  }
+
+  make_select_elements_chosen();
+
+</script>

@@ -88,7 +88,12 @@ module BpmIntegration
         def close_human_task
           return nil if Issue.find(self.id).status.is_closed || self.human_task_issue.human_task_id.blank?
           begin
-            response = BpmTaskService.resolve_task(self)
+            response = nil
+            Issue.transaction do
+              update_process_parent_issue_fields
+
+              response = BpmTaskService.resolve_task(self)
+            end
           rescue => error
             handle_error(l('msg_issue_closed_error'), Issue.find(self.id).id, error)
 
@@ -97,13 +102,11 @@ module BpmIntegration
           if response != nil && response.code == 200
             logger.info "#{self.class} - Tarefa completada no BPMS"
 
-            #JOB - Atualiza tarefas de um processo
-            SyncBpmTasksJob.perform_now(self.parent.process_instance.process_instance_id)
+            synchronize_process_tasks
 
             self.parent.reload
 
-            #JOB - Atualiza process_instances
-            SyncProcessInstancesJob.perform_now(self.parent.process_instance)
+            synchronize_process_status
 
           else
             logger.error "#{self.class} - Ocorreu um problema ao completar tarefa no BPMS. " + response.response.code + " - " + response.response.msg
@@ -111,6 +114,26 @@ module BpmIntegration
               logger.error response["exception"] if response.is_a? Hash
             rescue;end
           end
+        end
+
+        def update_process_parent_issue_fields
+          process_issue = self.parent
+
+          process_issue.init_journal(User.find(Setting.plugin_bpm_integration[:bpm_user]))
+
+          process_issue.custom_field_values = self.custom_field_values
+              .map { |cfv| {cfv.custom_field.id.to_s => cfv.value } }
+              .reduce({}, &:merge)
+
+          process_issue.save(validate: false)
+        end
+
+        def synchronize_process_status
+          SyncProcessInstancesJob.perform_now(self.parent.process_instance)
+        end
+
+        def synchronize_process_tasks
+          SyncBpmTasksJob.perform_now(self.parent.process_instance.process_instance_id)
         end
 
         def handle_error(msg_code, id, error = nil, response = nil, print_error = false)

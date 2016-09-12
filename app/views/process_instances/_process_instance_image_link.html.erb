@@ -1,4 +1,4 @@
-<% if issue.process_instance %>
+<% if User.current.admin? && issue.process_instance %>
   <%= stylesheet_link_tag "process_instances/process_instance_image_link", plugin: "bpm_integration" %>
   <%= javascript_include_tag "process_instances/process_instance_image_link", plugin: "bpm_integration" %>
 

@@ -44,12 +44,12 @@ class SyncProcessInstancesJob < ActiveJob::Base
   end
 
   def resolve_issue_process(issue_process_instance, historic_process)
+    user = User.find(Setting.plugin_bpm_integration[:bpm_user])
     issue = Issue.find(issue_process_instance.issue_id)
-    update_status(issue_process_instance, historic_process, issue)
+    update_status(issue_process_instance, historic_process, issue, user)
 
     #Seta msg de erro
     if historic_process.deleteReason
-      user = User.find(Setting.plugin_bpm_integration[:bpm_user])
       Journal.new(:journalized => issue, :user => user, :notes => historic_process.deleteReason, :private_notes => true).save
     end
     issue_process_instance.completed = true
@@ -58,7 +58,7 @@ class SyncProcessInstancesJob < ActiveJob::Base
     Delayed::Worker.logger.info "#{self.class} - Issue \##{issue.id.to_s} concluída mediante o fim do processo"
   end
 
-  def update_status(issue_process_instance, historic_process, issue)
+  def update_status(issue_process_instance, historic_process, issue, user)
     end_events = issue_process_instance.process_definition_version.end_events
     end_event_id = historic_process.endActivityId
 
@@ -68,7 +68,7 @@ class SyncProcessInstancesJob < ActiveJob::Base
           old_status = issue.status
           issue.status_id = end_event.issue_status_id
           issue.save!(validate:false)
-          add_end_event_note(end_event, issue, User.current, old_status)
+          add_end_event_note(end_event, issue, user, old_status)
           return nil
         end
       end

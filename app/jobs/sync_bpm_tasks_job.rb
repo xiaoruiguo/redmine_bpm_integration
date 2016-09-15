@@ -70,17 +70,24 @@ class SyncBpmTasksJob < ActiveJob::Base
     issue = Issue.new
     issue.status_id = task_definition.issue_status_id || Setting.plugin_bpm_integration[:new_status].to_i
     issue.subject = (task.name + " - " + parent.subject).truncate(255)
-    issue.description = parent.description
-    issue.priority_id = IssuePriority.default.id
-    issue.author_id = Setting.plugin_bpm_integration[:bpm_user].to_i
-    issue.tracker = get_tracker(task_definition)
-    issue.parent_id = parent.id
+    issue.description    = parent.description
+    issue.priority_id    = IssuePriority.default.id
+    issue.author_id      = get_author(task)
+    issue.tracker        = get_tracker(task_definition)
+    issue.parent_id      = parent.id
     issue.assigned_to_id = get_assignee_id(task.assignee)
-    issue.project_id = Project.where(identifier: task.formKey).pluck(:id).first || issue.parent.project_id
+    issue.project_id     = Project.where(identifier: task.formKey).pluck(:id).first || issue.parent.project_id
 
     issue.add_watcher(parent.author) if task_definition.add_author_as_watcher
 
     issue
+  end
+
+  def get_author(task)
+    form_fields_data = BpmTaskService.form_data(task.id)['formProperties']
+
+    ff_data          = form_fields_data.select { |ffd| ffd['id'] == 'author_id' }.first
+    (ff_data && convert_string_value_to_ruby_object(ff_data["value"])) || Setting.plugin_bpm_integration[:bpm_user].to_i
   end
 
   def get_tracker(task_definition)
@@ -112,7 +119,6 @@ class SyncBpmTasksJob < ActiveJob::Base
   end
 
   def convert_string_value_to_ruby_object(value)
-    (JSON::parse(value) rescue value) || '' # Json parse to parse array values rescue to avoid exception
+    JSON::parse(value) rescue value # Json parse to parse array values rescue to avoid exception
   end
-
 end

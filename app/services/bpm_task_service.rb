@@ -76,7 +76,7 @@ class BpmTaskService < ActivitiBpmService
   end
 
   def self.form_values(issue)
-    form_fields = issue.human_task_issue.task_definition.form_fields
+    form_fields = issue.human_task_issue.task_definition.form_fields.includes(:custom_field)
     form_fields ||= []
 
     hash_fields = form_fields.map do |ff|

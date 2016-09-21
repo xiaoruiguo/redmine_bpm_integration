@@ -41,11 +41,14 @@ class SyncBpmTasksJob < ActiveJob::Base
     e.backtrace.each { |line| Delayed::Worker.logger.error line }
   end
 
+  def self.reschedule_job
+    set(wait: SyncJobsPeriod.bpm_task_period).perform_later
+    Delayed::Worker.logger.info "#{self.class} - Sincronização de bpm_tasks agendada"
+  end
+
   after_perform do |job|
     if job.arguments.empty?
-      #JOB - Reagendamento
-      self.class.set(wait: SyncJobsPeriod.bpm_task_period).perform_later
-      Delayed::Worker.logger.info "#{self.class} - Sincronização de bpm_tasks agendada"
+      self.class.reschedule_job
     end
   end
 

@@ -3,16 +3,26 @@ class BpmTaskService < ActivitiBpmService
   require_relative '../models/bpm_task'
 
   def self.task_list(process_instance_id = nil)
-    if process_instance_id
-      hash_bpm_tasks = get("/runtime/tasks?processInstanceId=#{process_instance_id}", basic_auth: @@auth)
-    else
-      hash_bpm_tasks = get("/runtime/tasks", basic_auth: @@auth)
-    end
+    tasks_list_path = '/runtime/tasks'
+    size = 100
+    start = 0
+
     tasks = []
-    hash_bpm_tasks["data"].each do |t|
-      tasks << BpmTask.new(t)
+    loop do
+      params = {
+          size: size,
+          processInstanceId: process_instance_id,
+          start: start
+      }.compact.map { |k, v| "#{k}=#{v}" }.join('&')
+
+      hash_bpm_tasks = get("#{tasks_list_path}?#{params}", basic_auth: @@auth)
+      tasks += hash_bpm_tasks['data'].map { |t| BpmTask.new(t) }
+
+      start += size
+      break if start >= hash_bpm_tasks['total']
     end
-    return tasks
+
+    tasks
   end
 
   def self.update_task_default_fields(task_id, issue)

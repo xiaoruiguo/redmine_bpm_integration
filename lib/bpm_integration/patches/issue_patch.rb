@@ -3,9 +3,6 @@ module BpmIntegration
   module Patches
     module IssuePatch
 
-      require_relative '../../../app/jobs/sync_bpm_tasks_job'
-      require_relative '../../../app/jobs/sync_process_instances_job'
-
       def self.included(base) # :nodoc
         base.send(:include, InstanceMethods)
 
@@ -85,8 +82,6 @@ module BpmIntegration
         end
 
         def start_process_instance
-          require_relative('../../../app/jobs/start_process_job')
-          #JOB - Inicia processo
           StartProcessJob.perform_now(self.id)
         end
 

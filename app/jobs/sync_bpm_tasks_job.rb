@@ -30,7 +30,7 @@ class SyncBpmTasksJob < ActiveJob::Base
           Delayed::Worker.logger.error issue.errors.messages.to_s
         end
       rescue => exception
-        Delayed::Worker.logger.error exception.message
+        Delayed::Worker.logger.error "Erro ao tentar criar issue para a task '#{task.id}' do processo '#{task.processInstanceId}': #{exception.message}"
         exception.backtrace.each { |line| Delayed::Worker.logger.error line }
       end
     end

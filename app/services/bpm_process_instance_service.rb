@@ -9,10 +9,14 @@ class BpmProcessInstanceService < ActivitiBpmService
   end
 
   def self.historic_process_instance(process_instance_id)
+    params = query_parameters_from_hash({
+        processInstanceId: process_instance_id,
+        includeProcessVariables: true
+    })
     hash_bpm_process = get(
-      '/history/historic-process-instances/' + process_instance_id.to_s,
+      "/history/historic-process-instances?#{params}",
       basic_auth: @@auth
-    )
+    )['data'].first
     BpmProcessInstance.new(hash_bpm_process)
   end
 
@@ -59,11 +63,11 @@ class BpmProcessInstanceService < ActivitiBpmService
   private
 
   def self.start_process_request_body(process_key, business_key, form)
-    variables = []
     {
       processDefinitionKey: process_key,
       businessKey: business_key,
-      variables: variables_from_hash(form)
+      variables: variables_from_hash(form),
+      returnVariables: true
     }.to_json
   end
 

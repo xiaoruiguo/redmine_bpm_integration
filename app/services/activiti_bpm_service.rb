@@ -16,4 +16,9 @@ class ActivitiBpmService
     }.reduce([], &:<<)
   end
 
+
+  def self.query_parameters_from_hash(params)
+    params.compact.map { |k, v| "#{k}=#{v}" }.join('&')
+  end
+
 end

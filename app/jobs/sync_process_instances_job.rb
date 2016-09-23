@@ -13,6 +13,12 @@ class SyncProcessInstancesJob < ActiveJob::Base
 
   protected
 
+
+  def bpm_user
+    @bpm_user ||= User.find(Setting.plugin_bpm_integration[:bpm_user])
+  end
+
+
   def sync_process_instance_list
     Delayed::Worker.logger.info "#{self.class} - Sincronizando process_instances"
     BpmIntegration::IssueProcessInstance.where(completed:false).each do |p|
@@ -29,61 +35,68 @@ class SyncProcessInstancesJob < ActiveJob::Base
     exception.backtrace.each { |line| Delayed::Worker.logger.error line }
   end
 
+  def self.reschedule_job
+    set(wait: SyncJobsPeriod.process_instance_period).perform_later
+    Delayed::Worker.logger.info "#{self.class} - Sincronização de instancias de processos agendada"
+  end
+
   after_perform do |job|
     if job.arguments.empty?
-      #JOB - Reagendamento
-      self.class.set(wait: SyncJobsPeriod.process_instance_period).perform_later
-      Delayed::Worker.logger.info "#{self.class} - Sincronização de instancias de processos agendada"
+      self.class.reschedule_job
     end
   end
 
   def sync_process_instance(issue_process_instance)
     #TODO: Tratar erros no Activiti e atualizar para status Erro
     historic_process = BpmProcessInstanceService.historic_process_instance(issue_process_instance.process_instance_id)
-    resolve_issue_process(issue_process_instance,historic_process) unless historic_process.blank? || historic_process.endTime.blank?
+    if historic_process && historic_process.endTime.present?
+      resolve_issue_process(issue_process_instance, historic_process)
+    else
+      update_running_status(issue_process_instance, historic_process)
+    end
   end
 
   def resolve_issue_process(issue_process_instance, historic_process)
-    user = User.find(Setting.plugin_bpm_integration[:bpm_user])
-    issue = Issue.find(issue_process_instance.issue_id)
-    update_status(issue_process_instance, historic_process, issue, user)
+    update_closing_status(issue_process_instance, historic_process)
+    issue = issue_process_instance.issue
 
     #Seta msg de erro
-    if historic_process.deleteReason
-      Journal.new(:journalized => issue, :user => user, :notes => historic_process.deleteReason, :private_notes => true).save
+    if historic_process.deleteReason.present?
+      Journal.new(  journalized:  issue,
+                           user: bpm_user,
+                          notes:  historic_process.deleteReason,
+                  private_notes: true).save
     end
     issue_process_instance.completed = true
     issue_process_instance.save
     #TODO: Melhora log abaixo
-    Delayed::Worker.logger.info "#{self.class} - Issue \##{issue.id.to_s} concluída mediante o fim do processo"
+    Delayed::Worker.logger.info "#{self.class} - Issue \##{issue.id} concluída mediante o fim do processo"
   end
 
-  def update_status(issue_process_instance, historic_process, issue, user)
-    end_events = issue_process_instance.process_definition_version.end_events
-    end_event_id = historic_process.endActivityId
+  def update_closing_status(issue_process_instance, historic_process)
+    issue_process_instance.update_issue_status_on_close_for_end_event(historic_process.endActivityId)
+  end
 
-    issue.init_journal(user)
-
-    if !end_events.blank?
-      end_events.each do |end_event|
-        if end_event.identifier == end_event_id
-          issue.status_id = end_event.issue_status_id
-          issue.current_journal.notes = end_event.notes
-          issue.save!(validate:false)
-          return nil
-        end
+  def update_running_status(issue_process_instance, historic_process)
+    bpm_status_id = historic_process.status_id_variable
+    if bpm_status_id
+      issue = issue_process_instance.issue
+      if bpm_status_id != issue.status_id
+        new_status = IssueStatus.find(bpm_status_id)
+        issue.init_journal(bpm_user)
+        issue.status = new_status
+        issue.save!(validate: false)
       end
     end
-
-    issue.status_id = Setting.plugin_bpm_integration[:closed_status].to_i
-    issue.save!(validate:false)
   end
 
   def handle_error(issue, msg, e = nil)
     Delayed::Worker.logger.error l('error_process_instance_job')
     Delayed::Worker.logger.error msg
     e.backtrace.each { |line| Delayed::Worker.logger.error line }
-    user = User.find(Setting.plugin_bpm_integration[:bpm_user])
-    Journal.new(:journalized => issue, :user => user, :notes => l('error_process_instance_job') + ":  #{msg}", :private_notes => true).save
+    Journal.new(journalized: issue,
+                user: bpm_user,
+                notes: l('error_process_instance_job') + ":  #{msg}",
+                private_notes: true).save
   end
 end

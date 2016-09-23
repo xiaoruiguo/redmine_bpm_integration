@@ -15,6 +15,10 @@ class BpmIntegration::ProcessDefinitionVersion < BpmIntegrationBaseModel
   accepts_nested_attributes_for :constants
   accepts_nested_attributes_for :end_events
 
+  def end_event_for(end_event_identifier)
+    end_events.includes(:issue_status).find_by(identifier: end_event_identifier)
+  end
+
   def active= (is_active)
     if is_active == "1" || is_active == true
       av = process_definition.active_version

@@ -25,9 +25,12 @@ class StartProcessJob < ActiveJob::Base
       issue.process_instance.process_definition_version = process_definition_version
       issue.process_instance.completed = process.completed
       issue.process_instance.save!(validate:false)
-      issue.status_id = process.completed ?
-                          Setting.plugin_bpm_integration[:closed_status].to_i :
-                          Setting.plugin_bpm_integration[:doing_status].to_i
+
+      if process.completed
+        issue.process_instance = Setting.plugin_bpm_integration[:closed_status].to_i
+      else
+        issue.status_id = process.status_id_variable || Setting.plugin_bpm_integration[:doing_status].to_i
+      end
 
       issue.save!(validate:false)
 

@@ -105,12 +105,4 @@ class BpmTaskService < ActivitiBpmService
     hash_fields.merge!(default_fields_form_values(issue))
     hash_fields
   end
-
-  def self.default_fields_form_values(issue)
-    {
-      "status_id" => issue.status_id,
-      "user_id" => User.current.try(&:id)
-    }
-  end
-
 end

@@ -15,7 +15,9 @@ class StartProcessJob < ActiveJob::Base
       process_definition_version = issue.tracker.process_active_version
       form_data = form_values(process_definition_version.form_fields, issue)
       constants = process_constants(process_definition_version.constants)
-      variables = form_data.merge(constants)
+
+      variables = form_data.merge(constants).merge(core_fields(issue))
+
       process = BpmProcessInstanceService.start_process(
         process_definition_version.process_definition.key, issue.id, variables
       )
@@ -44,6 +46,10 @@ class StartProcessJob < ActiveJob::Base
   end
 
   private
+
+  def core_fields(issue)
+    ActivitiBpmService.default_fields_form_values(issue)
+  end
 
   def process_constants(constants)
     return {} if constants.blank?

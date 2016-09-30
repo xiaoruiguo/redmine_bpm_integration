@@ -19,7 +19,7 @@ class StartProcessJob < ActiveJob::Base
       variables = form_data.merge(constants).merge(core_fields(issue))
 
       process = BpmProcessInstanceService.start_process(
-        process_definition_version.process_definition.key, issue.id, variables
+        process_definition_version.process_identifier, issue.id, variables
       )
       issue.reload
       issue.process_instance ||= BpmIntegration::IssueProcessInstance.new

@@ -49,11 +49,11 @@ class BpmProcessInstanceService < ActivitiBpmService
     end
   end
 
-  def self.start_process(process_key, business_key, form)
+  def self.start_process(process_id, business_key, form)
     hash_process_instance = post(
       '/runtime/process-instances',
       basic_auth: @@auth,
-      body: start_process_request_body(process_key, business_key, form),
+      body: start_process_request_body(process_id, business_key, form),
       headers: { 'Content-Type' => 'application/json' }
     )
     raise hash_process_instance["exception"] if hash_process_instance["exception"]
@@ -64,7 +64,7 @@ class BpmProcessInstanceService < ActivitiBpmService
 
   def self.start_process_request_body(process_key, business_key, form)
     {
-      processDefinitionKey: process_key,
+      processDefinitionId: process_key,
       businessKey: business_key,
       variables: variables_from_hash(form),
       returnVariables: true

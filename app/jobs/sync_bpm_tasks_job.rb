@@ -13,15 +13,18 @@ class SyncBpmTasksJob < ActiveJob::Base
     Delayed::Worker.logger.info "#{self.class} - Sincronizando bpm_tasks para criar issues"
     read_human_tasks(process_instance_id).each do |task|
       begin
-        next if BpmIntegration::HumanTaskIssue.where(human_task_id:task.id).first
+        next if BpmIntegration::HumanTaskIssue.where(human_task_id: task.id).first
         task_definition = BpmIntegration::TaskDefinition.by_task_instance(
                                                             task.taskDefinitionKey, task.processDefinitionId).first
-        issue = build_issue_from_task(task, task_definition)
+
+        form_fields_data = BpmTaskService.form_data(task.id)['formProperties']
+
+        issue = build_issue_from_task(task, task_definition, form_fields_data)
         next if issue.nil?
 
         issue.human_task_issue = build_human_task_issue(task, task_definition)
 
-        issue.custom_fields = custom_values_from_task_form_data(task, task_definition)
+        issue.custom_fields = custom_values_from_task_form_data(task, task_definition, form_fields_data)
 
         if issue.save(validate: false)
           Delayed::Worker.logger.info "#{self.class} - Issue \##{issue.id} (" + issue.subject + ") criada baseada na human_task " + task.id
@@ -63,7 +66,7 @@ class SyncBpmTasksJob < ActiveJob::Base
     end
   end
 
-  def build_issue_from_task(task, task_definition)
+  def build_issue_from_task(task, task_definition, form_fields_data)
     parent_id = Issue.by_process_instance(task.processInstanceId).pluck(:id).first
     if parent_id.nil?
       Delayed::Worker.logger.error "Não existe nenhuma issue para este processo"
@@ -75,7 +78,7 @@ class SyncBpmTasksJob < ActiveJob::Base
     issue.subject = (task.name + " - " + parent.subject).truncate(255)
     issue.description    = parent.description
     issue.priority_id    = IssuePriority.default.id
-    issue.author_id      = get_author(task)
+    issue.author_id      = get_author(task, form_fields_data)
     issue.tracker        = get_tracker(task_definition)
     issue.parent_id      = parent.id
     issue.assigned_to_id = get_assignee_id(task.assignee)
@@ -86,9 +89,7 @@ class SyncBpmTasksJob < ActiveJob::Base
     issue
   end
 
-  def get_author(task)
-    form_fields_data = BpmTaskService.form_data(task.id)['formProperties']
-
+  def get_author(task, form_fields_data)
     ff_data          = form_fields_data.select { |ffd| ffd['id'] == 'author_id' }.first
     (ff_data && convert_string_value_to_ruby_object(ff_data["value"])) || Setting.plugin_bpm_integration[:bpm_user].to_i
   end
@@ -98,7 +99,8 @@ class SyncBpmTasksJob < ActiveJob::Base
   end
 
   def get_assignee_id(task_assignee)
-    Principal.where(id: task_assignee.to_i).pluck(:id).first
+    assignee_to = Principal.where(id: task_assignee.to_i).first
+    assignee_to.is_a?(AnonymousUser) ? nil : assignee_to.try(:id)
   end
 
   def build_human_task_issue(task, task_definition)
@@ -109,9 +111,8 @@ class SyncBpmTasksJob < ActiveJob::Base
     human_task_issue
   end
 
-  def custom_values_from_task_form_data(task, task_definition)
+  def custom_values_from_task_form_data(task, task_definition, form_fields_data)
     custom_field_values = []
-    form_fields_data = BpmTaskService.form_data(task.id)['formProperties']
 
     task_definition.form_fields.select { |ff| ff.readable }.each do |ff|
       ff_data = form_fields_data.select { |ffd| ffd["id"] == ff.field_id }.first

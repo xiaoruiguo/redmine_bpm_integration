@@ -78,7 +78,7 @@ class SyncProcessInstancesJob < ActiveJob::Base
   end
 
   def update_running_status(issue_process_instance, historic_process)
-    bpm_status_id = historic_process.status_id_variable
+    bpm_status_id = BpmProcessInstanceService.process_overall_status_variable(historic_process.id)
     if bpm_status_id
       issue = issue_process_instance.issue
       if bpm_status_id != issue.status_id

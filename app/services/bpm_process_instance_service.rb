@@ -10,14 +10,21 @@ class BpmProcessInstanceService < ActivitiBpmService
 
   def self.historic_process_instance(process_instance_id)
     params = query_parameters_from_hash({
-        processInstanceId: process_instance_id,
-        includeProcessVariables: true
+        processInstanceId: process_instance_id
     })
     hash_bpm_process = get(
       "/history/historic-process-instances?#{params}",
       basic_auth: @@auth
     )['data'].first
     BpmProcessInstance.new(hash_bpm_process)
+  end
+
+  def self.process_overall_status_variable(process_instance_id)
+    hash_bpm_process = get(
+      "/runtime/process-instances/#{process_instance_id}/variables/process_overall_status",
+      basic_auth: @@auth
+    )
+    hash_bpm_process['value']
   end
 
   def self.process_instance_list

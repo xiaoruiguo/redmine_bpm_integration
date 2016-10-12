@@ -21,7 +21,7 @@ class SyncProcessInstancesJob < ActiveJob::Base
 
   def sync_process_instance_list
     Delayed::Worker.logger.info "#{self.class} - Sincronizando process_instances"
-    BpmIntegration::IssueProcessInstance.where(completed:false).each do |p|
+    BpmIntegration::IssueProcessInstance.where(completed:false).find_each(batch_size: 100) do |p|
       begin
         sync_process_instance(p)
       rescue => exception
@@ -78,8 +78,8 @@ class SyncProcessInstancesJob < ActiveJob::Base
   end
 
   def update_running_status(issue_process_instance, historic_process)
-    bpm_status_id = BpmProcessInstanceService.process_overall_status_variable(historic_process.id)
-    if bpm_status_id
+    bpm_status_id = BpmProcessInstanceService.process_overall_status_variable(historic_process.id).to_i
+    if bpm_status_id > 0
       issue = issue_process_instance.issue
       if bpm_status_id != issue.status_id
         new_status = IssueStatus.find(bpm_status_id)

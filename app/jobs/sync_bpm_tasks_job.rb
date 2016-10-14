@@ -72,10 +72,12 @@ class SyncBpmTasksJob < ActiveJob::Base
       Delayed::Worker.logger.error "Não existe nenhuma issue para este processo"
       return nil
     end
+
     parent = Issue.find(parent_id)
-    issue = Issue.new
-    issue.status_id = task_definition.issue_status_id || Setting.plugin_bpm_integration[:new_status].to_i
-    issue.subject = (task.name + " - " + parent.subject).truncate(255)
+    issue  = Issue.new
+
+    issue.status_id      = get_status(task, form_fields_data, task_definition)
+    issue.subject        = (task.name + " - " + parent.subject).truncate(255)
     issue.description    = parent.description
     issue.priority_id    = IssuePriority.default.id
     issue.author_id      = get_author(task, form_fields_data)
@@ -87,6 +89,11 @@ class SyncBpmTasksJob < ActiveJob::Base
     issue.add_watcher(parent.author) if task_definition.add_author_as_watcher
 
     issue
+  end
+
+  def get_status(task, form_fields_data, task_definition)
+    ff_data          = form_fields_data.select { |ffd| ffd['id'] == 'status_id' }.first
+    (ff_data && convert_string_value_to_ruby_object(ff_data["value"])) || task_definition.issue_status_id || Setting.plugin_bpm_integration[:new_status].to_i
   end
 
   def get_author(task, form_fields_data)

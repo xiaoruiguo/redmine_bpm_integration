@@ -151,7 +151,7 @@ class SyncProcessDefinitionsJob < ActiveJob::Base
       form_fields = []
       task_form_properties.each do |form_item|
         next unless form_item["readable"]
-        next if form_item["id"] == 'author_id'
+        next if form_item["id"].in?(['author_id', 'status_id'])
 
         field_definition = find_or_build_form_field_definition(process, form_item)
 

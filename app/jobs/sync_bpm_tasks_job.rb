@@ -76,12 +76,12 @@ class SyncBpmTasksJob < ActiveJob::Base
     parent = Issue.find(parent_id)
     issue  = Issue.new
 
+    issue.tracker        = get_tracker(task_definition)
     issue.status_id      = get_status(task, form_fields_data, task_definition)
     issue.subject        = (task.name + " - " + parent.subject).truncate(255)
     issue.description    = parent.description
     issue.priority_id    = IssuePriority.default.id
     issue.author_id      = get_author(task, form_fields_data)
-    issue.tracker        = get_tracker(task_definition)
     issue.parent_id      = parent.id
     issue.assigned_to_id = get_assignee_id(task.assignee)
     issue.project_id     = Project.where(identifier: task.formKey).pluck(:id).first || issue.parent.project_id

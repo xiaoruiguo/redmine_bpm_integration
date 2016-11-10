@@ -100,16 +100,20 @@ module BpmIntegration
             return false
           end
           if response != nil && response.code == 200
-            logger.info "#{self.class} - Tarefa completada no BPMS"
+            logger.info "#{self.class} - (issue: #{self.id} | task: #{self.human_task_issue.human_task_id}) - Tarefa completada no BPMS"
 
             synchronize_process_tasks
+
+            logger.info "#{self.class} - (issue: #{self.id} | task: #{self.human_task_issue.human_task_id}) - Tarefas sincronizadas do BPMS"
 
             self.parent.reload
 
             synchronize_process_status
 
+            logger.info "#{self.class} - (issue: #{self.id} | task: #{self.human_task_issue.human_task_id}) - Processo sincronizado com BPMS"
+
           else
-            logger.error "#{self.class} - Ocorreu um problema ao completar tarefa no BPMS. " + response.response.code + " - " + response.response.msg
+            logger.error "#{self.class} - Ocorreu um problema ao completar tarefa (issue: #{self.id} | task: #{self.human_task_issue.human_task_id}) no BPMS. " + response.response.code + " - " + response.response.msg
             begin
               logger.error response["exception"] if response.is_a? Hash
             rescue;end

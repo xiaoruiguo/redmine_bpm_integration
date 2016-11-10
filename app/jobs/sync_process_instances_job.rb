@@ -91,7 +91,7 @@ class SyncProcessInstancesJob < ActiveJob::Base
   end
 
   def handle_error(issue, msg, e = nil)
-    Delayed::Worker.logger.error l('error_process_instance_job')
+    Delayed::Worker.logger.error l('error_process_instance_job', issue: issue.id)
     Delayed::Worker.logger.error msg
     e.backtrace.each { |line| Delayed::Worker.logger.error line }
     Journal.new(journalized: issue,

@@ -32,7 +32,7 @@ es:
   bpm_tasks: 'Tareas BPM'
 
   #Erros
-  error_process_instance_job: 'Ocurrió un error al intentar sincronizar con el proceso del BPMs'
+  error_process_instance_job: 'Ocurrió un error al intentar sincronizar la tarea #%{issue} con el proceso del BPMs'
   error_process_start: 'Ocurrió un error al iniciar un nuevo proceso.'
   error_bpm_tasks_job: 'Ocurrió un error al intentar sincronizar la lista de tareas con el BPMs.'
   msg_issue_closed_error: 'Ocurrió un error al intentar concluir la petición.'

@@ -20,7 +20,7 @@ class ActivitiBpmService
     {
       "status_id" => issue.status_id,
       "user_id" => User.current.try(&:id),
-      "created_on" => issue.created_on,
+      "created_on" => issue.created_on.in_time_zone('Brasilia'),
       "closed_on" => issue.closed_on
     }
   end

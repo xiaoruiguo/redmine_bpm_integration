@@ -82,7 +82,7 @@ module BpmIntegration
         end
 
         def start_process_instance
-          StartProcessJob.perform_now(self.id)
+          StartProcessJob.perform_later(self.id)
         end
 
         def close_human_task
@@ -102,13 +102,15 @@ module BpmIntegration
           if response != nil && response.code == 200
             logger.info "#{self.class} - (issue: #{self.id} | task: #{self.human_task_issue.human_task_id}) - Tarefa completada no BPMS"
 
-            synchronize_process_tasks
+            # LET THE JOBS RESCHEDULING DO THEIR JOB
+            # synchronize_process_tasks
 
             logger.info "#{self.class} - (issue: #{self.id} | task: #{self.human_task_issue.human_task_id}) - Tarefas sincronizadas do BPMS"
 
             self.parent.reload
 
-            synchronize_process_status
+            # LET THE JOBS RESCHEDULING DO THEIR JOB
+            # synchronize_process_status
 
             logger.info "#{self.class} - (issue: #{self.id} | task: #{self.human_task_issue.human_task_id}) - Processo sincronizado com BPMS"
 

@@ -28,6 +28,7 @@ class SyncBpmTasksJob < ActiveJob::Base
 
         if issue.save(validate: false)
           Delayed::Worker.logger.info "#{self.class} - Issue \##{issue.id} (" + issue.subject + ") criada baseada na human_task " + task.id
+          SyncProcessInstancesJob.perform_now(issue.parent.process_instance)
         else
           Delayed::Worker.logger.error "Ocorreram erros ao tentar salvar a issue " + issue.subject + "baseada na human_task " + task.id + ":"
           Delayed::Worker.logger.error issue.errors.messages.to_s

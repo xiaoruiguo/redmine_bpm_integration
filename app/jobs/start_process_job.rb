@@ -1,5 +1,5 @@
 class StartProcessJob < ActiveJob::Base
-  queue_as :default
+  queue_as :bpm_process_instances
 
   include Redmine::I18n
 
@@ -39,7 +39,7 @@ class StartProcessJob < ActiveJob::Base
       Delayed::Worker.logger.info "#{self.class} - Issue \##{issue.id} - Processo " + issue.process_instance.process_instance_id.to_s + " iniciado com sucesso!"
 
       #JOB - Atualiza tarefas de um processo
-      SyncBpmTasksJob.perform_now(issue.process_instance.process_instance_id)
+      SyncBpmTasksJob.perform_later(issue.process_instance.process_instance_id)
     rescue => exception
       handle_error(issue, exception)
     end

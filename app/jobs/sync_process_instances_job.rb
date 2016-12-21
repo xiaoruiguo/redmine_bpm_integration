@@ -47,12 +47,19 @@ class SyncProcessInstancesJob < ActiveJob::Base
   end
 
   def sync_process_instance(issue_process_instance)
+    @issue_process_instance = issue_process_instance
     #TODO: Tratar erros no Activiti e atualizar para status Erro
+    log(:info, 'Sincronizando status do processo')
     historic_process = BpmProcessInstanceService.historic_process_instance(issue_process_instance.process_instance_id)
+    log(:info, historic_process.inspect)
     if historic_process && historic_process.endTime.present?
+      log(:info, 'Concluindo processo')
       resolve_issue_process(issue_process_instance, historic_process)
+      log(:info, 'Processo concluido')
     else
+      log(:info, 'Atualizando status do processo')
       update_running_status(issue_process_instance, historic_process)
+      log(:info, 'Status do processo atualizado')
     end
   end
 
@@ -74,11 +81,19 @@ class SyncProcessInstancesJob < ActiveJob::Base
   end
 
   def update_closing_status(issue_process_instance, historic_process)
-    issue_process_instance.update_issue_status_on_close_for_end_event(historic_process.endActivityId)
+    old_status = issue_process_instance.issue.status
+    if issue_process_instance.update_issue_status_on_close_for_end_event(historic_process.endActivityId)
+      new_status = issue_process_instance.issue.status
+      log(:info, "Status alterado de #{[old_status.id, old_status.name]} para #{[new_status.id, new_status.name]}")
+    else
+      log(:error, 'Erro ao concluir tarefa')
+    end
   end
 
   def update_running_status(issue_process_instance, historic_process)
-    bpm_status_id = BpmProcessInstanceService.process_overall_status_variable(historic_process.id).to_i
+    process_status_variable = BpmProcessInstanceService.process_overall_status_variable(historic_process.id)
+    log(:info, "Variavel de status do processo: #{process_status_variable.inspect}")
+    bpm_status_id = process_status_variable['value'].to_i
     if bpm_status_id > 0
       issue = issue_process_instance.issue
       if bpm_status_id != issue.status_id
@@ -88,6 +103,11 @@ class SyncProcessInstancesJob < ActiveJob::Base
         issue.save!(validate: false)
       end
     end
+  end
+
+  def log(log_level, msg)
+    Delayed::Worker.logger.send(log_level, "#{Time.zone.now.to_formatted_s} | #{logger.local_log_id} | #{self.class} - " +
+        "(issue: #{@issue_process_instance.issue.id} | process_instance: #{@issue_process_instance.process_instance_id}) - #{msg}")
   end
 
   def handle_error(issue, msg, e = nil)

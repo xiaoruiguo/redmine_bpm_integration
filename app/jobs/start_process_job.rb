@@ -1,5 +1,5 @@
 class StartProcessJob < ActiveJob::Base
-  queue_as :default
+  queue_as :bpmint_start_process
 
   include Redmine::I18n
 
@@ -22,27 +22,36 @@ class StartProcessJob < ActiveJob::Base
         process_definition_version.process_identifier, issue.id, variables
       )
       issue.reload
-      issue.process_instance ||= BpmIntegration::IssueProcessInstance.new
-      issue.process_instance.process_instance_id = process.id
-      issue.process_instance.process_definition_version = process_definition_version
-      issue.process_instance.completed = process.completed
-      issue.process_instance.save!(validate:false)
 
-      if process.completed
-        issue.process_instance = Setting.plugin_bpm_integration[:closed_status].to_i
-      else
-        issue.status_id = process.status_id_variable || Setting.plugin_bpm_integration[:doing_status].to_i
+      Issue.transaction do
+        issue.process_instance ||= BpmIntegration::IssueProcessInstance.new
+        issue.process_instance.process_instance_id = process.id
+        issue.process_instance.process_definition_version = process_definition_version
+        issue.process_instance.completed = process.completed
+        issue.process_instance.save!(validate:false)
+
+        if process.completed
+          issue.process_instance = Setting.plugin_bpm_integration[:closed_status].to_i
+        else
+          issue.status_id = process.status_id_variable || Setting.plugin_bpm_integration[:doing_status].to_i
+        end
+
+        issue.save!(validate:false)
+
+        Delayed::Worker.logger.info "#{self.class} - Issue \##{issue.id} - Processo " + issue.process_instance.process_instance_id.to_s + " iniciado com sucesso!"
+
+        #JOB - Atualiza tarefas de um processo
+        SyncBpmTasksJob.perform_now(issue.process_instance.process_instance_id)
       end
-
-      issue.save!(validate:false)
-
-      Delayed::Worker.logger.info "#{self.class} - Issue \##{issue.id} - Processo " + issue.process_instance.process_instance_id.to_s + " iniciado com sucesso!"
-
-      #JOB - Atualiza tarefas de um processo
-      SyncBpmTasksJob.perform_now(issue.process_instance.process_instance_id)
     rescue => exception
-      handle_error(issue, exception)
+      handle_error(exception)
+
+      self.class.reschedule_job(issue_id)
     end
+  end
+
+  def self.reschedule_job(issue_id)
+    set(wait: SyncJobsPeriod.reschedule_start_process_on_error).perform_later(issue_id)
   end
 
   private
@@ -72,13 +81,11 @@ class StartProcessJob < ActiveJob::Base
     hash_fields.reduce(&:merge) || {}
   end
 
-  def handle_error(issue, e)
+  def handle_error(e)
     Delayed::Worker.logger.error l('error_process_start')
     Delayed::Worker.logger.error e.message
     e.backtrace.each { |line| Delayed::Worker.logger.error line }
     Delayed::Worker.logger.error "\n\n"
-    user = User.find(Setting.plugin_bpm_integration[:bpm_user])
-    Journal.new(:journalized => issue, :user => user, :notes => l('error_process_start') + ":  #{e.message}", :private_notes => true).save
   end
 
 end

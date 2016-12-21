@@ -24,7 +24,7 @@ class BpmProcessInstanceService < ActivitiBpmService
       "/runtime/process-instances/#{process_instance_id}/variables/process_overall_status",
       basic_auth: @@auth
     )
-    hash_bpm_process['value']
+    hash_bpm_process
   end
 
   def self.process_instance_list

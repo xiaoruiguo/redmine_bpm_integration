@@ -1,15 +1,9 @@
 Rails.configuration.to_prepare do
-  ActiveSupport::Dependencies
-     .autoload_paths << File.expand_path('../app/services', __FILE__)
+  ActiveSupport::Dependencies.autoload_paths << File.expand_path('../app/services', __FILE__)
+  ActiveSupport::Dependencies.autoload_paths << File.expand_path('../app/jobs', __FILE__)
 end
 
 require_relative './lib/bpm_integration/utils/sync_jobs_period'
-
-require_relative './app/jobs/start_process_job'
-require_relative './app/jobs/sync_process_definitions_job'
-require_relative './app/jobs/sync_bpm_tasks_job'
-require_relative './app/jobs/sync_process_instances_job'
-
 
 Redmine::Plugin.register :bpm_integration do
   name 'BPM Integration Plugin'

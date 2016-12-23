@@ -3,6 +3,7 @@ class SyncJobsPeriod
   @bpm_task = 60.seconds
   @process_instance = 60.seconds
   @reschedule_start_process_on_error = 5.minutes
+  @reschedule_close_task = 5.minutes
 
   def self.bpm_task_period
     @bpm_task
@@ -14,6 +15,10 @@ class SyncJobsPeriod
 
   def self.reschedule_start_process_on_error
     @reschedule_start_process_on_error
+  end
+
+  def self.reschedule_close_task
+    @reschedule_close_task
   end
 
 end

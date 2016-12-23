@@ -87,75 +87,12 @@ module BpmIntegration
 
         def close_human_task
           return nil if self.status_was.is_closed || self.human_task_issue.human_task_id.blank?
-          begin
-            response = nil
-            Issue.transaction do
-              update_process_parent_issue_fields
-
-              response = BpmTaskService.resolve_task(self)
-              log(:info, "Resposta do Activiti para fechar tarefa: #{response.response.code} - #{response.response.msg}")
-
-              if (response != nil) && (response.code != 200)
-                log(:error, "Ocorreu um problema ao completar tarefa no BPMS.")
-                log(:error, response["exception"]) if response.is_a?(Hash) && response["exception"].present?
-              end
-            end
-          rescue => error
-            handle_error(l('msg_issue_closed_error'), error)
-
+          if CloseBpmTaskJob.perform_now(self, self.status_id, false)
+            CloseBpmTaskJob.perform_later(self.id, self.status_id)
+          else
+            errors[:base] << l('msg_issue_closed_error')
             return false
           end
-          if (response != nil) && (response.code == 200)
-            log(:info, "Tarefa completada no BPMS")
-
-            synchronize_process_tasks
-
-            log(:info, "Tarefas sincronizadas do BPMS")
-
-            self.parent.reload
-
-            synchronize_process_status
-
-            log(:info, "Processo sincronizado com BPMS")
-          end
-        end
-
-        def handle_error(msg_code, error, print_error = false)
-          log(:error, self.class)
-          print_msg = "#{msg_code.to_s} #{error.message.to_s}"
-          log(:error, error.message)
-          error.backtrace.each { |line| logger.error line }
-
-          if print_error
-            msg_code = print_msg
-          end
-
-          errors[:base] << msg_code
-        end
-
-        def log(log_level, msg)
-          logger.send(log_level, "#{Time.zone.now.to_formatted_s} | #{logger.local_log_id} | #{self.class} - " +
-                          "(issue: #{self.id} | task: #{self.human_task_issue.human_task_id}) - #{msg}")
-        end
-
-        def update_process_parent_issue_fields
-          process_issue = self.parent
-
-          process_issue.init_journal(User.find(Setting.plugin_bpm_integration[:bpm_user]))
-
-          process_issue.custom_field_values = self.custom_field_values
-              .map { |cfv| {cfv.custom_field.id.to_s => cfv.value } }
-              .reduce({}, &:merge)
-
-          process_issue.save(validate: false)
-        end
-
-        def synchronize_process_status
-          SyncProcessInstancesJob.perform_now(self.parent.process_instance)
-        end
-
-        def synchronize_process_tasks
-          SyncBpmTasksJob.perform_now(self.parent.process_instance.process_instance_id)
         end
 
       end

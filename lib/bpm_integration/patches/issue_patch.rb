@@ -134,7 +134,7 @@ module BpmIntegration
         end
 
         def log(log_level, msg)
-          logger.send(log_level, "#{Time.zone.now.to_formatted_s} | #{logger.local_log_id} | #{self.class} - " +
+          logger.send(log_level, "#{Time.zone.now.to_formatted_s} | #{logger.object_id} | #{self.class} - " +
                           "(issue: #{self.id} | task: #{self.human_task_issue.human_task_id}) - #{msg}")
         end
 

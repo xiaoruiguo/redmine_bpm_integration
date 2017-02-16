@@ -106,7 +106,7 @@ class SyncProcessInstancesJob < ActiveJob::Base
   end
 
   def log(log_level, msg)
-    logger.send(log_level, "#{Time.zone.now.to_formatted_s} | #{logger.local_log_id} | #{self.class} - " +
+    logger.send(log_level, "#{Time.zone.now.to_formatted_s} | #{logger.object_id} | #{self.class} - " +
         "(issue: #{@issue_process_instance.issue.id} | process_instance: #{@issue_process_instance.process_instance_id}) - #{msg}")
   end
 

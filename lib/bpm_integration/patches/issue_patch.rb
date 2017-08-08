@@ -17,7 +17,7 @@ module BpmIntegration
                                           }
 
           after_commit :start_process_instance, if: 'self.tracker.is_bpm_process? && self.parent.try(:tracker_id) != tracker_id', on: :create
-          before_save :close_human_task, if: 'self.status.is_closed and self.is_human_task?'
+          before_save :close_human_task, if: 'self.status.try(:is_closed) and self.is_human_task?'
 
           alias_method_chain :available_custom_fields, :bpm_form_fields
           alias_method_chain :read_only_attribute_names, :bpm_form_fields
@@ -86,7 +86,7 @@ module BpmIntegration
         end
 
         def close_human_task
-          return nil if self.status_was.is_closed || self.human_task_issue.human_task_id.blank?
+          return nil if self.status_was.try(:is_closed) || self.human_task_issue.human_task_id.blank?
           begin
             response = nil
             Issue.transaction do

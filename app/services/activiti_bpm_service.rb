@@ -18,6 +18,7 @@ class ActivitiBpmService
 
   def self.default_fields_form_values(issue)
     {
+      "issue_id" => issue.id,
       "status_id" => issue.status_id,
       "user_id" => User.current.try(&:id),
       "created_on" => issue.created_on.in_time_zone('Brasilia'),
